@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gastos · Balance por categoría y mes</title>
+    <title>Gastos · Registro y Reporte semanal</title>
     <style>
         /* ---------- Reset & Fuente ---------- */
         * {
@@ -27,6 +27,70 @@
         .app {
             max-width: 820px;
             width: 100%;
+        }
+
+        /* ---------- Landing Page ---------- */
+        #landing {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0d0d0d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 40px 20px;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        #landing.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #landing h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        #landing p {
+            color: #8e8e93;
+            font-size: 18px;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        #landing .btn-entrar {
+            background: #2c2c2e;
+            border: 1px solid #3a3a3c;
+            border-radius: 14px;
+            padding: 16px 48px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 20px rgba(10, 132, 255, 0.2);
+            font-family: inherit;
+            letter-spacing: -0.2px;
+        }
+
+        #landing .btn-entrar:hover {
+            background: #3a3a3c;
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(10, 132, 255, 0.4);
+        }
+
+        #landing .btn-entrar:active {
+            transform: scale(0.97);
         }
 
         /* ---------- Header ---------- */
@@ -118,10 +182,19 @@
             margin-bottom: 24px;
             border: 0.5px solid #3a3a3c;
             display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .summary-card .row {
+            display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
+        }
+
+        .summary-card .row+.row {
+            border-top: 1px solid #3a3a3c;
+            padding-top: 8px;
         }
 
         .summary-card .label {
@@ -131,13 +204,21 @@
         }
 
         .summary-card .value {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #ff453a;
             letter-spacing: -0.5px;
         }
 
-        /* ---------- Formulario ---------- */
+        .summary-card .value.positive {
+            color: #30d158;
+        }
+
+        .summary-card .value.neutral {
+            color: #8e8e93;
+        }
+
+        /* ---------- Formulario registro ---------- */
         .form-card {
             background: #2c2c2e;
             border-radius: 14px;
@@ -162,7 +243,6 @@
             display: none;
         }
 
-        /* Estilo común para inputs y el trigger del dropdown */
         .form-group input,
         .custom-select .select-trigger {
             width: 100%;
@@ -203,7 +283,7 @@
             padding: 11px 14px;
         }
 
-        /* ---------- Botón Agregar con sombreado azul ---------- */
+        /* ---------- Botón Agregar ---------- */
         .btn-add {
             background: #2c2c2e;
             border: 1px solid #3a3a3c;
@@ -485,119 +565,260 @@
             font-size: 15px;
         }
 
-        /* ---------- Balance por categoría ---------- */
-        .category-balance-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 8px;
+        /* ---------- Filtros del reporte ---------- */
+        .filter-section {
+            background: #2c2c2e;
+            border-radius: 14px;
+            padding: 18px 18px 14px;
+            margin-bottom: 24px;
+            border: 0.5px solid #3a3a3c;
         }
 
-        .category-item {
+        .filter-section .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 12px;
+            letter-spacing: -0.2px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .filter-group {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .category-item .cat-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
+        .filter-group label {
+            font-size: 13px;
             font-weight: 500;
-            color: #e5e5ea;
-        }
-
-        .category-item .cat-header .cat-total {
-            font-weight: 600;
-            color: #ff453a;
-        }
-
-        .category-item .bar-bg {
-            width: 100%;
-            height: 8px;
-            background: #3a3a3c;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .category-item .bar-fill {
-            height: 100%;
-            background: #0a84ff;
-            border-radius: 10px;
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-
-        .category-item .bar-fill.high {
-            background: #ff453a;
-        }
-        .category-item .bar-fill.medium {
-            background: #ff9f0a;
-        }
-        .category-item .bar-fill.low {
-            background: #30d158;
-        }
-
-        /* ---------- Balance por mes ---------- */
-        .month-balance-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .month-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .month-item .month-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-            font-weight: 500;
-            color: #e5e5ea;
-        }
-
-        .month-item .month-header .month-total {
-            font-weight: 600;
-            color: #ff453a;
-        }
-
-        .month-item .bar-bg {
-            width: 100%;
-            height: 8px;
-            background: #3a3a3c;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .month-item .bar-fill {
-            height: 100%;
-            background: #0a84ff;
-            border-radius: 10px;
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-
-        .month-item .bar-fill.high {
-            background: #ff453a;
-        }
-        .month-item .bar-fill.medium {
-            background: #ff9f0a;
-        }
-        .month-item .bar-fill.low {
-            background: #30d158;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
             color: #8e8e93;
         }
 
-        /* ---------- NOTIFICACIONES PERSONALIZADAS ---------- */
+        .filter-group .custom-select,
+        .filter-group .week-selector {
+            width: 100%;
+        }
+
+        .filter-group input {
+            width: 100%;
+            background: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #e5e5ea;
+            outline: none;
+            transition: 0.2s;
+            height: 44px;
+        }
+
+        .filter-group input:focus {
+            border-color: #0a84ff;
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            grid-column: 1 / -1;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+
+        .btn-filter {
+            background: #2c2c2e;
+            border: 1px solid #3a3a3c;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            transition: 0.2s;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-filter:hover {
+            background: #3a3a3c;
+        }
+
+        .btn-filter:active {
+            transform: scale(0.97);
+        }
+
+        /* ---------- Selector de semana personalizado ---------- */
+        .week-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            border-radius: 10px;
+            padding: 4px 6px;
+            height: 44px;
+            flex-wrap: nowrap;
+        }
+
+        .week-selector .week-nav-btn {
+            background: none;
+            border: none;
+            color: #8e8e93;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 2px 8px;
+            transition: 0.2s;
+            line-height: 1;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .week-selector .week-nav-btn:hover {
+            background: #2c2c2e;
+            color: #e5e5ea;
+        }
+
+        .week-selector .week-nav-btn:active {
+            transform: scale(0.9);
+        }
+
+        .week-selector .week-range-text {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e5e5ea;
+            text-align: center;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+
+        .week-selector .week-today-btn {
+            background: #0a84ff;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            transition: 0.2s;
+            height: 30px;
+            white-space: nowrap;
+        }
+
+        .week-selector .week-today-btn:hover {
+            background: #0070e0;
+        }
+
+        /* ---------- Configuración: presupuestos ---------- */
+        .budget-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #2c2c2e;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            border: 0.5px solid #3a3a3c;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .budget-item .budget-category {
+            font-size: 16px;
+            font-weight: 500;
+            color: #e5e5ea;
+            min-width: 120px;
+        }
+
+        .budget-item .budget-input {
+            flex: 1;
+            min-width: 120px;
+            max-width: 200px;
+        }
+
+        .budget-item .budget-input input {
+            width: 100%;
+            background: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #e5e5ea;
+            outline: none;
+            height: 44px;
+            transition: 0.2s;
+        }
+
+        .budget-item .budget-input input:focus {
+            border-color: #0a84ff;
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+        }
+
+        .budget-item .budget-input input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .budget-item .budget-input input[type="number"]::-webkit-outer-spin-button,
+        .budget-item .budget-input input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .budget-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-save-budgets {
+            background: #0a84ff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-save-budgets:hover {
+            background: #0070e0;
+            transform: scale(0.98);
+        }
+
+        .btn-reset-budgets {
+            background: #2c2c2e;
+            border: 1px solid #3a3a3c;
+            border-radius: 12px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-reset-budgets:hover {
+            background: #3a3a3c;
+        }
+
+        /* ---------- NOTIFICACIONES ---------- */
         #notification-container {
             position: fixed;
             top: 24px;
@@ -657,7 +878,7 @@
             pointer-events: none;
         }
 
-        /* ---------- MODAL PERSONALIZADO (coherente con la app) ---------- */
+        /* ---------- MODAL ---------- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -755,11 +976,18 @@
             transform: scale(0.95);
         }
 
-        /* ---------- RESPONSIVE (móviles) ---------- */
+        /* ---------- RESPONSIVE ---------- */
         @media (max-width: 640px) {
-            .form-row {
-                flex-direction: column;
-                align-items: stretch;
+            .form-row,
+            .filter-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .filter-actions {
+                justify-content: stretch;
+            }
+            .filter-actions .btn-filter {
+                flex: 1;
             }
             .form-group {
                 flex: 1 0 auto;
@@ -777,7 +1005,7 @@
                 padding: 12px 6px;
             }
             .summary-card .value {
-                font-size: 24px;
+                font-size: 20px;
             }
             .expense-item {
                 flex-wrap: wrap;
@@ -796,19 +1024,6 @@
                 right: 8px;
                 top: 8px;
             }
-            .category-item .cat-header {
-                font-size: 15px;
-            }
-            .month-item .month-header {
-                font-size: 15px;
-            }
-            .custom-select {
-                height: 48px;
-            }
-            .custom-select .select-trigger {
-                height: 48px;
-                padding: 12px 14px;
-            }
             #notification-container {
                 top: 16px;
                 width: 95%;
@@ -818,6 +1033,29 @@
             }
             .modal-actions {
                 flex-direction: column;
+            }
+            .budget-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .budget-item .budget-input {
+                max-width: 100%;
+            }
+            .week-selector {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 8px;
+                justify-content: center;
+            }
+            .week-selector .week-range-text {
+                min-width: 100px;
+                font-size: 13px;
+            }
+            #landing h1 {
+                font-size: 36px;
+            }
+            #landing p {
+                font-size: 16px;
             }
         }
 
@@ -833,7 +1071,7 @@
                 padding: 14px 16px;
             }
             .summary-card .value {
-                font-size: 20px;
+                font-size: 18px;
             }
             .form-card {
                 padding: 16px 12px;
@@ -841,15 +1079,31 @@
             .tab-panel {
                 padding: 16px 12px;
             }
+            .filter-section {
+                padding: 14px 12px;
+            }
+            .week-selector .week-range-text {
+                font-size: 12px;
+                min-width: 80px;
+            }
         }
+
+        /* Estilo para el botón "Entrar" en la landing (ya definido arriba) */
     </style>
 </head>
 <body>
 
-    <!-- Contenedor de notificaciones -->
+    <!-- LANDING PAGE -->
+    <div id="landing">
+        <h1>Gastos</h1>
+        <p>Registra tus gastos y consulta el reporte semanal de forma sencilla.</p>
+        <button class="btn-entrar" id="entrarBtn">Entrar</button>
+    </div>
+
+    <!-- Notificaciones -->
     <div id="notification-container"></div>
 
-    <!-- Modal personalizado -->
+    <!-- Modal -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-box">
             <h3>¿Eliminar gasto?</h3>
@@ -861,25 +1115,27 @@
         </div>
     </div>
 
-    <div class="app">
+    <div class="app" id="appContainer">
         <!-- Header -->
         <div class="app-header">
             <h1>Gastos</h1>
-            <p>Registra tus gastos y consulta el balance por categoría o por mes.</p>
+            <p>Registra tus gastos y consulta el reporte semanal (viernes a jueves).</p>
         </div>
 
         <!-- Tabs -->
         <div class="tabs" role="tablist">
             <button class="tab-btn active" data-tab="tab1" role="tab">Registro</button>
-            <button class="tab-btn" data-tab="tab2" role="tab">Por categoría</button>
-            <button class="tab-btn" data-tab="tab3" role="tab">Por mes</button>
+            <button class="tab-btn" data-tab="tab2" role="tab">Reporte</button>
+            <button class="tab-btn" data-tab="tab3" role="tab">Configuración</button>
         </div>
 
         <!-- Panel 1: Registro -->
         <div class="tab-panel active" id="tab1" role="tabpanel">
             <div class="summary-card">
-                <span class="label">Total gastos</span>
-                <span class="value" id="totalExpenses">0,00 €</span>
+                <div class="row">
+                    <span class="label">Total gastos</span>
+                    <span class="value" id="totalExpenses">0,00 €</span>
+                </div>
             </div>
 
             <div class="form-card">
@@ -926,16 +1182,73 @@
             <div class="expense-list" id="expenseList"></div>
         </div>
 
-        <!-- Panel 2: Balance por categoría -->
+        <!-- Panel 2: Reporte semanal -->
         <div class="tab-panel" id="tab2" role="tabpanel">
-            <h2 style="font-size:20px; font-weight:600; margin-bottom:16px; letter-spacing:-0.3px; color:#ffffff;">Gastos por categoría</h2>
-            <div id="categoryBalanceContainer"></div>
+            <!-- Tarjeta de resumen con dos líneas -->
+            <div class="summary-card" id="reportSummary">
+                <div class="row">
+                    <span class="label">Total semana</span>
+                    <span class="value" id="reportTotal">0,00 €</span>
+                </div>
+                <div class="row">
+                    <span class="label">Resto disponible</span>
+                    <span class="value positive" id="reportRemaining">0,00 €</span>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filter-section">
+                <div class="filter-title">Filtros</div>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label>Categoría</label>
+                        <div class="custom-select" id="reportCategoryDropdown">
+                            <button type="button" class="select-trigger" id="reportDropdownTrigger">
+                                <span id="reportSelectedCategoryText">Todas</span>
+                                <svg class="chevron" viewBox="0 0 24 24">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-menu" id="reportDropdownMenu"></ul>
+                            <input type="hidden" id="reportCategoryInput" value="todas" />
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Semana</label>
+                        <div class="week-selector">
+                            <button class="week-nav-btn" id="weekPrev">‹</button>
+                            <span class="week-range-text" id="weekRangeDisplay">Cargando...</span>
+                            <button class="week-nav-btn" id="weekNext">›</button>
+                            <button class="week-today-btn" id="weekToday">Hoy</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn-filter" id="applyFilterBtn">Aplicar filtro</button>
+                        <button class="btn-filter" id="clearFilterBtn" style="background:#1c1c1e;">Limpiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list-header">
+                <h2>Resultados</h2>
+                <span class="count" id="reportCount">0</span>
+            </div>
+            <div class="expense-list" id="reportList"></div>
         </div>
 
-        <!-- Panel 3: Balance por mes -->
+        <!-- Panel 3: Configuración (presupuestos) -->
         <div class="tab-panel" id="tab3" role="tabpanel">
-            <h2 style="font-size:20px; font-weight:600; margin-bottom:16px; letter-spacing:-0.3px; color:#ffffff;">Evolución mensual</h2>
-            <div id="monthBalanceContainer"></div>
+            <h2 style="font-size:20px; font-weight:600; margin-bottom:16px; letter-spacing:-0.3px; color:#ffffff;">Presupuestos mensuales por categoría</h2>
+            <p style="color:#8e8e93; margin-bottom:20px; font-size:15px;">Define un límite de gasto para cada categoría. Te ayudará a controlar tus finanzas.</p>
+
+            <div id="budgetList"></div>
+
+            <div class="budget-actions">
+                <button class="btn-save-budgets" id="saveBudgetsBtn">Guardar presupuestos</button>
+                <button class="btn-reset-budgets" id="resetBudgetsBtn">Restablecer</button>
+            </div>
         </div>
     </div>
 
@@ -943,7 +1256,15 @@
         (function() {
             'use strict';
 
-            // ---------- NOTIFICACIONES PERSONALIZADAS ----------
+            // ---------- LANDING PAGE ----------
+            const landing = document.getElementById('landing');
+            const entrarBtn = document.getElementById('entrarBtn');
+
+            entrarBtn.addEventListener('click', function() {
+                landing.classList.add('hidden');
+            });
+
+            // ---------- NOTIFICACIONES ----------
             const notificationContainer = document.getElementById('notification-container');
 
             function showNotification(message, type = 'info', duration = 3000) {
@@ -960,7 +1281,7 @@
                 }, duration);
             }
 
-            // ---------- MODAL PERSONALIZADO ----------
+            // ---------- MODAL ----------
             const modalOverlay = document.getElementById('confirmModal');
             const modalCancel = document.getElementById('modalCancel');
             const modalConfirm = document.getElementById('modalConfirm');
@@ -979,30 +1300,22 @@
             modalCancel.addEventListener('click', hideConfirmModal);
             modalConfirm.addEventListener('click', function() {
                 if (pendingDeleteId !== null) {
-                    // Eliminar el gasto
                     expenses = expenses.filter(e => e.id !== pendingDeleteId);
                     saveToLocal();
                     renderExpenses();
-                    renderCategoryBalance();
-                    renderMonthlyBalance();
+                    renderReport();
                     showNotification('Gasto eliminado correctamente', 'success');
                     pendingDeleteId = null;
                     hideConfirmModal();
                 }
             });
 
-            // Cerrar modal al hacer clic en el overlay (fuera del box)
             modalOverlay.addEventListener('click', function(e) {
-                if (e.target === modalOverlay) {
-                    hideConfirmModal();
-                }
+                if (e.target === modalOverlay) hideConfirmModal();
             });
 
-            // Cerrar con ESC
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                    hideConfirmModal();
-                }
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) hideConfirmModal();
             });
 
             // ---------- CONSTANTES ----------
@@ -1020,6 +1333,11 @@
             let expenses = [];
             let nextId = 1;
             let selectedCategory = 'Alimentación';
+            let reportSelectedCategory = 'todas';
+            let budgets = {};
+
+            // Variables para la semana personalizada (viernes a jueves)
+            let currentFriday = null; // Date que representa el viernes de inicio de la semana
 
             // DOM
             const form = document.getElementById('expenseForm');
@@ -1029,20 +1347,80 @@
             const expenseListEl = document.getElementById('expenseList');
             const totalExpensesEl = document.getElementById('totalExpenses');
             const expenseCountEl = document.getElementById('expenseCount');
-            const categoryBalanceContainer = document.getElementById('categoryBalanceContainer');
-            const monthBalanceContainer = document.getElementById('monthBalanceContainer');
 
+            const reportListEl = document.getElementById('reportList');
+            const reportTotalEl = document.getElementById('reportTotal');
+            const reportRemainingEl = document.getElementById('reportRemaining');
+            const reportCountEl = document.getElementById('reportCount');
+
+            // Filtros
+            const applyFilterBtn = document.getElementById('applyFilterBtn');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+            const weekRangeDisplay = document.getElementById('weekRangeDisplay');
+            const weekPrev = document.getElementById('weekPrev');
+            const weekNext = document.getElementById('weekNext');
+            const weekToday = document.getElementById('weekToday');
+
+            // Dropdown de categoría en registro
             const dropdownContainer = document.getElementById('categoryDropdown');
             const dropdownTrigger = document.getElementById('dropdownTrigger');
             const dropdownMenu = document.getElementById('dropdownMenu');
             const selectedCategoryText = document.getElementById('selectedCategoryText');
             const categoryInputHidden = document.getElementById('categoryInput');
 
+            // Dropdown de categoría en reporte
+            const reportDropdownContainer = document.getElementById('reportCategoryDropdown');
+            const reportDropdownTrigger = document.getElementById('reportDropdownTrigger');
+            const reportDropdownMenu = document.getElementById('reportDropdownMenu');
+            const reportSelectedCategoryText = document.getElementById('reportSelectedCategoryText');
+            const reportCategoryInput = document.getElementById('reportCategoryInput');
+
+            // Configuración
+            const budgetListEl = document.getElementById('budgetList');
+            const saveBudgetsBtn = document.getElementById('saveBudgetsBtn');
+            const resetBudgetsBtn = document.getElementById('resetBudgetsBtn');
+
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabPanels = document.querySelectorAll('.tab-panel');
 
-            // ---------- Cargar datos (sin ejemplos) ----------
+            // ---------- Funciones de fecha ----------
+            function getTodayDate() {
+                const d = new Date();
+                return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            }
+
+            function formatDate(date) {
+                const d = date;
+                return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+            }
+
+            // Obtiene el viernes más cercano anterior (o el mismo día si es viernes)
+            function getPreviousFriday(date) {
+                const d = new Date(date);
+                const day = d.getDay(); // 0=domingo, 5=viernes
+                const diff = (day >= 5) ? (day - 5) : (day + 2); // días a restar
+                d.setDate(d.getDate() - diff);
+                return d;
+            }
+
+            // Suma/resta semanas a un viernes
+            function addWeeksToFriday(friday, weeks) {
+                const d = new Date(friday);
+                d.setDate(d.getDate() + weeks * 7);
+                return d;
+            }
+
+            // Obtiene el rango de la semana (viernes a jueves) a partir del viernes
+            function getWeekRange(friday) {
+                const start = new Date(friday);
+                const end = new Date(friday);
+                end.setDate(end.getDate() + 6);
+                return { start, end };
+            }
+
+            // ---------- Cargar datos ----------
             function loadData() {
+                // Gastos
                 const stored = localStorage.getItem('expenses_data');
                 if (stored) {
                     try {
@@ -1051,12 +1429,26 @@
                             expenses = parsed;
                             const maxId = expenses.reduce((max, e) => Math.max(max, e.id || 0), 0);
                             nextId = maxId + 1;
-                            return;
                         }
                     } catch (_) {}
                 }
-                expenses = [];
-                nextId = 1;
+
+                // Presupuestos
+                const storedBudgets = localStorage.getItem('budgets_data');
+                if (storedBudgets) {
+                    try {
+                        const parsed = JSON.parse(storedBudgets);
+                        if (typeof parsed === 'object') {
+                            budgets = parsed;
+                        }
+                    } catch (_) {}
+                }
+                CATEGORIES.forEach(cat => {
+                    if (!(cat in budgets)) {
+                        budgets[cat] = 0;
+                    }
+                });
+
                 saveToLocal();
             }
 
@@ -1068,9 +1460,10 @@
 
             function saveToLocal() {
                 localStorage.setItem('expenses_data', JSON.stringify(expenses));
+                localStorage.setItem('budgets_data', JSON.stringify(budgets));
             }
 
-            // ---------- Dropdown ----------
+            // ---------- Dropdown de registro ----------
             function renderDropdown() {
                 dropdownMenu.innerHTML = '';
                 CATEGORIES.forEach(cat => {
@@ -1115,7 +1508,64 @@
                 if (e.key === 'Escape') closeDropdown();
             });
 
-            // ---------- Renderizar lista ----------
+            // ---------- Dropdown de reporte (categoría) ----------
+            function renderReportDropdown() {
+                reportDropdownMenu.innerHTML = '';
+                const allLi = document.createElement('li');
+                allLi.dataset.value = 'todas';
+                allLi.innerHTML = `Todas <span class="check">✓</span>`;
+                if (reportSelectedCategory === 'todas') allLi.classList.add('active');
+                allLi.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    selectReportCategory('todas');
+                    closeReportDropdown();
+                });
+                reportDropdownMenu.appendChild(allLi);
+
+                CATEGORIES.forEach(cat => {
+                    const li = document.createElement('li');
+                    li.dataset.value = cat;
+                    li.innerHTML = `${cat} <span class="check">✓</span>`;
+                    if (cat === reportSelectedCategory) li.classList.add('active');
+                    li.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        selectReportCategory(cat);
+                        closeReportDropdown();
+                    });
+                    reportDropdownMenu.appendChild(li);
+                });
+            }
+
+            function selectReportCategory(cat) {
+                reportSelectedCategory = cat;
+                reportSelectedCategoryText.textContent = cat === 'todas' ? 'Todas' : cat;
+                reportCategoryInput.value = cat;
+                document.querySelectorAll('#reportDropdownMenu li').forEach(li => {
+                    li.classList.toggle('active', li.dataset.value === cat);
+                });
+                renderReport();
+            }
+
+            function toggleReportDropdown() {
+                reportDropdownContainer.classList.toggle('open');
+            }
+
+            function closeReportDropdown() {
+                reportDropdownContainer.classList.remove('open');
+            }
+
+            reportDropdownTrigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleReportDropdown();
+            });
+            document.addEventListener('click', function(e) {
+                if (!reportDropdownContainer.contains(e.target)) closeReportDropdown();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeReportDropdown();
+            });
+
+            // ---------- Renderizar lista de registro ----------
             function renderExpenses() {
                 if (expenses.length === 0) {
                     expenseListEl.innerHTML = `<div class="empty-state">No hay gastos registrados.</div>`;
@@ -1151,7 +1601,7 @@
                 expenseListEl.innerHTML = html;
                 expenseCountEl.textContent = expenses.length;
 
-                document.querySelectorAll('.delete-btn').forEach(btn => {
+                document.querySelectorAll('#expenseList .delete-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const id = parseInt(this.dataset.id, 10);
                         showConfirmModal(id);
@@ -1197,6 +1647,12 @@
                     return;
                 }
 
+                const budget = budgets[category] || 0;
+                const totalCategory = expenses.filter(e => e.category === category).reduce((s, e) => s + e.amount, 0);
+                if (budget > 0 && (totalCategory + amount) > budget) {
+                    showNotification(`⚠️ Superas el presupuesto de ${category} (${budget.toFixed(2)} €)`, 'error', 4000);
+                }
+
                 expenses.push({
                     id: nextId++,
                     category,
@@ -1206,8 +1662,7 @@
                 });
                 saveToLocal();
                 renderExpenses();
-                renderCategoryBalance();
-                renderMonthlyBalance();
+                renderReport();
                 showNotification('Gasto agregado correctamente.', 'success');
 
                 descInput.value = '';
@@ -1216,99 +1671,200 @@
                 descInput.focus();
             });
 
-            // ---------- Balance por categoría ----------
-            function renderCategoryBalance() {
-                if (expenses.length === 0) {
-                    categoryBalanceContainer.innerHTML = `<div class="no-data">No hay gastos para mostrar.</div>`;
+            // ---------- Funciones de reporte ----------
+            function filterExpenses() {
+                const cat = reportSelectedCategory;
+                let filtered = [...expenses];
+
+                if (cat !== 'todas') {
+                    filtered = filtered.filter(e => e.category === cat);
+                }
+
+                if (currentFriday) {
+                    const range = getWeekRange(currentFriday);
+                    const start = new Date(range.start);
+                    start.setHours(0, 0, 0, 0);
+                    const end = new Date(range.end);
+                    end.setHours(23, 59, 59, 999);
+                    filtered = filtered.filter(e => {
+                        const expDate = new Date(e.date + 'T00:00:00');
+                        return expDate >= start && expDate <= end;
+                    });
+                }
+
+                return filtered;
+            }
+
+            function renderReport() {
+                const filtered = filterExpenses();
+
+                // Actualizar total semana
+                const totalSemana = filtered.reduce((sum, e) => sum + e.amount, 0);
+                reportTotalEl.textContent = totalSemana.toFixed(2).replace('.', ',') + ' €';
+
+                // Calcular presupuesto total mensual (suma de todas las categorías)
+                let totalBudget = 0;
+                for (let cat in budgets) {
+                    totalBudget += budgets[cat];
+                }
+                const weeksInMonth = 5;
+                const weeklyBudget = totalBudget / weeksInMonth;
+                const remaining = weeklyBudget - totalSemana;
+
+                // Mostrar resto disponible
+                if (totalBudget === 0) {
+                    reportRemainingEl.textContent = 'Sin presupuesto';
+                    reportRemainingEl.className = 'value neutral';
+                } else {
+                    reportRemainingEl.textContent = remaining.toFixed(2).replace('.', ',') + ' €';
+                    reportRemainingEl.className = 'value ' + (remaining >= 0 ? 'positive' : '');
+                }
+
+                // Mostrar lista de resultados
+                if (filtered.length === 0) {
+                    reportListEl.innerHTML = `<div class="empty-state">No hay gastos que coincidan con los filtros.</div>`;
+                    reportCountEl.textContent = '0';
                     return;
                 }
 
-                const map = new Map();
-                let maxTotal = 0;
-                expenses.forEach(exp => {
-                    const cat = exp.category;
-                    const current = map.get(cat) || 0;
-                    const newTotal = current + exp.amount;
-                    map.set(cat, newTotal);
-                    if (newTotal > maxTotal) maxTotal = newTotal;
+                const sorted = [...filtered].sort((a, b) => {
+                    if (a.date < b.date) return 1;
+                    if (a.date > b.date) return -1;
+                    return b.id - a.id;
                 });
 
-                const sorted = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
-
-                let html = `<div class="category-balance-list">`;
-                sorted.forEach(([cat, total]) => {
-                    const pct = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
-                    let barClass = 'low';
-                    if (pct > 70) barClass = 'high';
-                    else if (pct > 40) barClass = 'medium';
-
+                let html = '';
+                sorted.forEach(exp => {
+                    const dateObj = new Date(exp.date + 'T00:00:00');
+                    const dateStr = dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short',
+                        year: 'numeric' });
                     html += `
-                        <div class="category-item">
-                            <div class="cat-header">
-                                <span>${esc(cat)}</span>
-                                <span class="cat-total">${total.toFixed(2).replace('.', ',')} €</span>
+                        <div class="expense-item" data-id="${exp.id}">
+                            <div class="info">
+                                <div class="category-badge">${esc(exp.category)}</div>
+                                <div class="description">${esc(exp.description)}</div>
+                                <div class="meta">${dateStr}</div>
                             </div>
-                            <div class="bar-bg">
-                                <div class="bar-fill ${barClass}" style="width: ${pct}%;"></div>
+                            <div class="amount">- ${exp.amount.toFixed(2).replace('.', ',')} €</div>
+                            <button class="delete-btn" data-id="${exp.id}">✕</button>
+                        </div>
+                    `;
+                });
+
+                reportListEl.innerHTML = html;
+                reportCountEl.textContent = filtered.length;
+
+                document.querySelectorAll('#reportList .delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.dataset.id, 10);
+                        showConfirmModal(id);
+                    });
+                });
+            }
+
+            // ---------- Actualizar el selector de semana ----------
+            function updateWeekDisplay() {
+                if (!currentFriday) return;
+                const range = getWeekRange(currentFriday);
+                const startStr = formatDate(range.start);
+                const endStr = formatDate(range.end);
+                weekRangeDisplay.textContent = `${startStr} → ${endStr}`;
+                renderReport();
+            }
+
+            function setWeek(friday) {
+                currentFriday = new Date(friday);
+                updateWeekDisplay();
+            }
+
+            function goToTodayWeek() {
+                const today = getTodayDate();
+                const friday = getPreviousFriday(today);
+                setWeek(friday);
+            }
+
+            function goToPreviousWeek() {
+                if (!currentFriday) return;
+                const newFriday = addWeeksToFriday(currentFriday, -1);
+                setWeek(newFriday);
+            }
+
+            function goToNextWeek() {
+                if (!currentFriday) return;
+                const newFriday = addWeeksToFriday(currentFriday, 1);
+                setWeek(newFriday);
+            }
+
+            // ---------- Botones de filtro ----------
+            applyFilterBtn.addEventListener('click', function() {
+                renderReport();
+            });
+
+            clearFilterBtn.addEventListener('click', function() {
+                selectReportCategory('todas');
+                goToTodayWeek();
+            });
+
+            // Eventos de navegación semanal
+            weekPrev.addEventListener('click', goToPreviousWeek);
+            weekNext.addEventListener('click', goToNextWeek);
+            weekToday.addEventListener('click', goToTodayWeek);
+
+            // ---------- Configuración: Presupuestos ----------
+            function renderBudgets() {
+                let html = '';
+                CATEGORIES.forEach(cat => {
+                    const val = budgets[cat] || 0;
+                    html += `
+                        <div class="budget-item" data-category="${cat}">
+                            <span class="budget-category">${cat}</span>
+                            <div class="budget-input">
+                                <input type="number" class="budget-input-field" value="${val}" step="0.01" min="0" placeholder="0,00" />
                             </div>
                         </div>
                     `;
                 });
-                html += `</div>`;
-                categoryBalanceContainer.innerHTML = html;
+                budgetListEl.innerHTML = html;
             }
 
-            // ---------- Balance por mes ----------
-            function renderMonthlyBalance() {
-                if (expenses.length === 0) {
-                    monthBalanceContainer.innerHTML = `<div class="no-data">No hay gastos para mostrar.</div>`;
-                    return;
-                }
-
-                const map = new Map();
-                let maxTotal = 0;
-                expenses.forEach(exp => {
-                    const monthKey = exp.date.substring(0, 7);
-                    const current = map.get(monthKey) || 0;
-                    const newTotal = current + exp.amount;
-                    map.set(monthKey, newTotal);
-                    if (newTotal > maxTotal) maxTotal = newTotal;
+            function saveBudgets() {
+                const inputs = document.querySelectorAll('.budget-input-field');
+                inputs.forEach((input, index) => {
+                    const cat = CATEGORIES[index];
+                    const val = parseFloat(input.value);
+                    if (!isNaN(val) && val >= 0) {
+                        budgets[cat] = val;
+                    } else {
+                        budgets[cat] = 0;
+                    }
                 });
-
-                const sorted = Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-
-                let html = `<div class="month-balance-list">`;
-                sorted.forEach(([monthKey, total]) => {
-                    const [year, month] = monthKey.split('-');
-                    const dateObj = new Date(year, month - 1, 1);
-                    const monthName = dateObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-                    const pct = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
-                    let barClass = 'low';
-                    if (pct > 70) barClass = 'high';
-                    else if (pct > 40) barClass = 'medium';
-
-                    html += `
-                        <div class="month-item">
-                            <div class="month-header">
-                                <span>${esc(monthName)}</span>
-                                <span class="month-total">${total.toFixed(2).replace('.', ',')} €</span>
-                            </div>
-                            <div class="bar-bg">
-                                <div class="bar-fill ${barClass}" style="width: ${pct}%;"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-                monthBalanceContainer.innerHTML = html;
+                saveToLocal();
+                showNotification('Presupuestos guardados correctamente.', 'success');
+                renderBudgets();
+                renderReport(); // actualizar el resto disponible
             }
+
+            function resetBudgets() {
+                CATEGORIES.forEach(cat => { budgets[cat] = 0; });
+                saveToLocal();
+                renderBudgets();
+                renderReport();
+                showNotification('Presupuestos restablecidos a cero.', 'info');
+            }
+
+            saveBudgetsBtn.addEventListener('click', saveBudgets);
+            resetBudgetsBtn.addEventListener('click', resetBudgets);
 
             // ---------- Tabs ----------
             function switchTab(tabId) {
                 tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
                 tabPanels.forEach(panel => panel.classList.toggle('active', panel.id === tabId));
-                if (tabId === 'tab2') renderCategoryBalance();
-                if (tabId === 'tab3') renderMonthlyBalance();
+                if (tabId === 'tab2') {
+                    renderReport();
+                }
+                if (tabId === 'tab3') {
+                    renderBudgets();
+                }
             }
 
             tabButtons.forEach(btn => {
@@ -1321,11 +1877,17 @@
             function init() {
                 loadData();
                 renderDropdown();
+                renderReportDropdown();
                 dateInput.value = getToday();
                 selectCategory(CATEGORIES[0]);
+                selectReportCategory('todas');
+                // Inicializar semana actual (viernes anterior)
+                const today = getTodayDate();
+                const friday = getPreviousFriday(today);
+                setWeek(friday);
                 renderExpenses();
-                renderCategoryBalance();
-                renderMonthlyBalance();
+                renderReport();
+                renderBudgets();
                 switchTab('tab1');
             }
 
