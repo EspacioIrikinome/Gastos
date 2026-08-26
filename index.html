@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Gastos">
     <link rel="apple-touch-icon" sizes="180x180" href="Gastos.png">
-    <title>Gastos · Alimentación</title>
+    <title>Gastos · MultiCuenta</title>
 
     <style>
     :root {
@@ -26,8 +26,8 @@
         --line: rgba(148, 163, 184, 0.16);
         --line-strong: rgba(148, 163, 184, 0.26);
 
-        --primary: #070b14;
-        --primary-dark: #070b14;
+        --primary: #0ea5e9;
+        --primary-dark: #0284c7;
         --primary-soft: rgba(14, 165, 233, 0.16);
         --primary-glow: rgba(14, 165, 233, 0.32);
 
@@ -116,7 +116,8 @@
     }
 
     button,
-    input {
+    input,
+    select {
         font: inherit;
         outline: none;
     }
@@ -139,7 +140,8 @@
     }
 
     button:focus-visible,
-    input:focus-visible {
+    input:focus-visible,
+    select:focus-visible {
         outline: 3px solid rgba(129, 140, 248, 0.7);
         outline-offset: 3px;
     }
@@ -158,6 +160,11 @@
             calc(22px + var(--safe-top))
             18px
             20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
     .app-header::after {
@@ -198,11 +205,29 @@
     }
 
     .app-brand p {
-        margin-top: 6px;
+        margin-top: 4px;
         color: var(--muted);
         font-size: 12px;
         font-weight: 650;
         letter-spacing: 0.01em;
+    }
+
+    .account-selector-btn {
+        background: var(--surface-light);
+        border: 1px solid var(--line);
+        border-radius: 99px;
+        color: var(--text-soft);
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .account-selector-btn:hover {
+        background: var(--surface-hover);
     }
 
     .tab-panel {
@@ -240,7 +265,7 @@
 
     .form-card {
         position: relative;
-        overflow: visible; /* ← clave para que el popup no se corte */
+        overflow: visible;
         border: 1px solid var(--line);
         background: var(--surface);
         box-shadow: var(--shadow-md);
@@ -338,6 +363,11 @@
         text-shadow: 0 0 22px rgba(52, 211, 153, 0.28);
     }
 
+    .summary-card .value.negative {
+        color: var(--danger);
+        text-shadow: 0 0 22px rgba(244, 63, 94, 0.28);
+    }
+
     .form-card {
         padding: 16px;
         margin-bottom: 26px;
@@ -364,6 +394,7 @@
     }
 
     .form-group input,
+    .form-group select,
     .category-static,
     .budget-input input {
         width: 100%;
@@ -382,12 +413,18 @@
         appearance: none;
     }
 
+    .form-group select option {
+        background: var(--bg-soft);
+        color: #fff;
+    }
+
     .form-group input::placeholder,
     .budget-input input::placeholder {
         color: #718096;
     }
 
     .form-group input:focus,
+    .form-group select:focus,
     .budget-input input:focus {
         border-color: var(--primary);
         background: rgba(99, 102, 241, 0.1);
@@ -403,7 +440,7 @@
     .date-picker-popup {
         display: none;
         position: absolute;
-        bottom: calc(100% + 6px);  /* ← aparece arriba del input */
+        bottom: calc(100% + 6px);
         left: 0;
         right: 0;
         z-index: 10000;
@@ -416,7 +453,7 @@
         -webkit-backdrop-filter: blur(18px);
         width: 100%;
         min-width: 280px;
-        max-height: 400px; /* por si acaso, con scroll si es muy alto */
+        max-height: 400px;
         overflow-y: auto;
     }
 
@@ -548,7 +585,7 @@
     .btn-save-budgets {
         min-height: 54px;
         border-radius: var(--radius-md);
-        color: var(--danger);
+        color: #fff;
         background:
             linear-gradient(
                 135deg,
@@ -681,12 +718,19 @@
     }
 
     .expense-item .amount {
-        color: var(--danger);
         font-size: 16px;
         font-weight: 850;
         letter-spacing: -0.025em;
         white-space: nowrap;
         flex-shrink: 0;
+    }
+
+    .expense-item .amount.income {
+        color: var(--success);
+    }
+
+    .expense-item .amount.expense {
+        color: var(--danger);
     }
 
     .expense-item .delete-btn {
@@ -936,6 +980,7 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
 
+    /* ===== LANDING ===== */
     #landing {
         position: fixed;
         inset: 0;
@@ -1034,7 +1079,7 @@
         min-height: 56px;
         border: 1px solid rgba(255, 255, 255, 0.22);
         border-radius: 18px;
-        color: #60a5fa;
+        color: #fff;
         background:
             linear-gradient(
                 135deg,
@@ -1048,6 +1093,105 @@
         font-weight: 850;
     }
 
+    /* ===== SELECTOR DE CUENTAS ===== */
+    #accountSelector {
+        position: fixed;
+        inset: 0;
+        z-index: 99998;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px calc(30px + var(--safe-bottom));
+        background:
+            radial-gradient(
+                circle at 50% 22%,
+                rgba(99, 102, 241, 0.25),
+                transparent 35%
+            ),
+            var(--bg);
+        overflow-y: auto;
+    }
+
+    #accountSelector.visible {
+        display: flex;
+    }
+
+    #accountSelector h2 {
+        color: #fff;
+        font-size: 28px;
+        font-weight: 850;
+        letter-spacing: -0.03em;
+        margin-bottom: 8px;
+    }
+
+    #accountSelector .sub {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 28px;
+        text-align: center;
+    }
+
+    .account-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        width: 100%;
+        max-width: 440px;
+    }
+
+    .account-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        padding: 20px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .account-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--line-strong);
+        box-shadow: var(--shadow-md);
+    }
+
+    .account-card:active {
+        transform: scale(0.96);
+    }
+
+    .account-card .icon {
+        font-size: 36px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .account-card .name {
+        color: #fff;
+        font-weight: 800;
+        font-size: 16px;
+        letter-spacing: -0.02em;
+    }
+
+    .account-card .balance {
+        display: block;
+        margin-top: 6px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--muted);
+    }
+
+    .account-card .balance.positive {
+        color: var(--success);
+    }
+    .account-card .balance.negative {
+        color: var(--danger);
+    }
+
+    /* ===== NOTIFICACIONES ===== */
     #notification-container {
         position: fixed;
         top: calc(16px + var(--safe-top));
@@ -1090,6 +1234,7 @@
         transition: all 0.25s ease;
     }
 
+    /* ===== MODAL ===== */
     .modal-overlay {
         position: fixed;
         inset: 0;
@@ -1210,6 +1355,7 @@
             font-size: 12px;
         }
         .form-group input,
+        .form-group select,
         .category-static,
         .budget-input input {
             min-height: 46px;
@@ -1351,6 +1497,22 @@
             font-size: 12px;
             padding: 12px 14px;
         }
+
+        #accountSelector h2 {
+            font-size: 24px;
+        }
+        .account-grid {
+            gap: 12px;
+        }
+        .account-card {
+            padding: 16px 12px;
+        }
+        .account-card .icon {
+            font-size: 28px;
+        }
+        .account-card .name {
+            font-size: 14px;
+        }
     }
 
     @media (max-width: 380px) {
@@ -1377,6 +1539,10 @@
         .expense-item .amount {
             font-size: 12px;
         }
+        .account-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
     }
 
     @media (min-width: 560px) {
@@ -1400,6 +1566,9 @@
         .budget-card {
             padding: 22px;
         }
+        .account-grid {
+            max-width: 480px;
+        }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1414,29 +1583,44 @@
     }
 </style>
 </head>
-
 <body>
 
+    <!-- LANDING -->
     <div id="landing">
         <div class="landing-logo">
             <img src="Gastos.png" alt="Gastos" class="app-logo" style="width: 110px; height: auto;">
         </div>
 
-        <h1>Gastos</h1>
+        <h1>FinPlanner</h1>
 
         <p>
-            Controla tu alimentación, registra cada gasto y consulta cuánto
-            presupuesto te queda.
+            Controla tus finanzas personales con múltiples cuentas.
+            Registra ingresos y gastos, y consulta tu presupuesto.
         </p>
 
         <button class="btn-entrar" id="entrarBtn">Empezar</button>
     </div>
 
+    <!-- SELECTOR DE CUENTAS -->
+    <div id="accountSelector">
+  <div class="landing-logo">
+            <img src="Gastos.png" alt="Gastos" class="app-logo" style="width: 110px; height: auto;">
+        </div>
+        <h2>Selecciona tu cuenta</h2>
+        <p class="sub">Elige la cuenta que quieres gestionar</p>
+
+        <div class="account-grid" id="accountGrid">
+            <!-- Se genera dinámicamente con JS -->
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
     <div id="notification-container"></div>
 
+    <!-- MODAL CONFIRMACIÓN -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-box">
-            <h3>¿Eliminar gasto?</h3>
+            <h3>¿Eliminar transacción?</h3>
             <p>Esta acción no se puede deshacer.</p>
 
             <div class="modal-actions">
@@ -1451,19 +1635,25 @@
         </div>
     </div>
 
-    <div class="app" id="appContainer">
+    <!-- APP PRINCIPAL -->
+    <div class="app" id="appContainer" style="display:none;">
 
         <header class="app-header">
             <div class="app-brand">
                 <img src="Gastos.png" alt="Gastos" class="app-logo">
 
                 <div>
-                    <h1>Gastos</h1>
-                    <p>Alimentación · Control semanal</p>
+                    <h1 id="appTitle">Gastos</h1>
+                    <p id="appSubtitle">Alimentación · Control semanal</p>
                 </div>
             </div>
+
+            <button class="account-selector-btn" id="changeAccountBtn">
+                 Cambiar cuenta
+            </button>
         </header>
 
+        <!-- TABS -->
         <div class="tabs" role="tablist">
             <button class="tab-btn active" data-tab="tab1" role="tab">
                 Registro
@@ -1482,7 +1672,7 @@
             </button>
         </div>
 
-        <!-- ===== PESTAÑA REGISTRO (solo formulario) ===== -->
+        <!-- PESTAÑA REGISTRO -->
         <div class="tab-panel active" id="tab1" role="tabpanel">
 
             <div class="form-card">
@@ -1492,8 +1682,16 @@
 
                         <div class="form-group">
                             <label for="categoryStatic">Categoría</label>
-                            <div class="category-static">Alimentación</div>
+                            <div class="category-static" id="categoryDisplay">Alimentación</div>
                             <input type="hidden" id="categoryInput" value="Alimentación">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="typeSelect">Tipo</label>
+                            <select id="typeSelect">
+                                <option value="gasto">Gasto</option>
+                                <option value="ingreso">Ingreso</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -1516,7 +1714,7 @@
                             >
                         </div>
 
-                        <!-- SELECTOR DE FECHA PERSONALIZADO -->
+                        <!-- SELECTOR DE FECHA -->
                         <div class="form-group">
                             <label for="dateInput">Fecha</label>
                             <div class="date-picker-wrapper">
@@ -1546,7 +1744,7 @@
                         <!-- FIN SELECTOR -->
 
                         <button type="submit" class="btn-add">
-                            ＋ Añadir gasto
+                            ＋ Añadir transacción
                         </button>
 
                     </div>
@@ -1555,15 +1753,24 @@
 
         </div>
 
-        <!-- ===== PESTAÑA REPORTE ===== -->
+        <!-- PESTAÑA REPORTE -->
         <div class="tab-panel" id="tab2" role="tabpanel">
 
             <div class="summary-card" id="reportSummary">
 
-                <!-- NUEVA FILA: Gasto acumulado (total histórico) -->
                 <div class="row">
-                    <span class="label">Gasto acumulado</span>
-                    <span class="value" id="totalExpenses">0,00 €</span>
+                    <span class="label">Ingresos</span>
+                    <span class="value positive" id="reportIncome">0,00 €</span>
+                </div>
+
+                <div class="row">
+                    <span class="label">Gastos</span>
+                    <span class="value negative" id="reportExpenses">0,00 €</span>
+                </div>
+
+                <div class="row">
+                    <span class="label">Saldo</span>
+                    <span class="value" id="reportBalance">0,00 €</span>
                 </div>
 
                 <div class="row">
@@ -1644,7 +1851,7 @@
             <div class="expense-list" id="reportList"></div>
         </div>
 
-        <!-- ===== PESTAÑA AJUSTES ===== -->
+        <!-- PESTAÑA AJUSTES -->
         <div class="tab-panel" id="tab3" role="tabpanel">
 
             <div class="budget-card">
@@ -1658,8 +1865,8 @@
                 </p>
 
                 <div class="budget-item">
-                    <span class="budget-category">
-                        🍽️ Alimentación
+                    <span class="budget-category" id="budgetCategoryLabel">
+                        Alimentación
                     </span>
 
                     <div class="budget-input">
@@ -1683,16 +1890,11 @@
                         Restablecer a 0
                     </button>
 
-                    <!-- Botón para reiniciar ciclo (opcional) -->
-                    <button class="btn-reset-budgets" id="resetCycleBtn" style="border-color: var(--warning); color: var(--warning);">
-                        Reiniciar ciclo
-                    </button>
-
                 </div>
             </div>
         </div>
 
-        <!-- ===== PESTAÑA HISTÓRICO ===== -->
+        <!-- PESTAÑA HISTÓRICO -->
         <div class="tab-panel" id="tab4" role="tabpanel">
 
             <div class="summary-card">
@@ -1703,7 +1905,7 @@
             </div>
 
             <div class="list-header">
-                <h2>Todos los gastos</h2>
+                <h2>Todas las transacciones</h2>
                 <span class="count" id="historicoCount">0</span>
             </div>
 
@@ -1716,46 +1918,73 @@
         (function () {
             'use strict';
 
-            const CATEGORY = 'Alimentación';
+            // ===== CONFIGURACIÓN DE CUENTAS =====
+            const ACCOUNTS_CONFIG = [
+                { id: 'gastos', name: 'Alimentación', icon: '', emoji: '', defaultCategory: 'Alimentación' },
+                { id: 'viajes', name: 'Viajes', icon: '', emoji: '', defaultCategory: 'Viajes' },
+                { id: 'imprevistos', name: 'Imprevistos', icon: '', emoji: '', defaultCategory: 'Imprevistos' },
+                { id: 'personal', name: 'Personal', icon: '', emoji: '', defaultCategory: 'Personal' }
+            ];
+
             const WEEKS_PER_MONTH = 5;
 
-            let expenses = [];
-            let nextId = 1;
-            let budgetTotal = 0;
-            let currentFriday = null;
+            // ===== ESTADO =====
+            let accountsData = {}; // { accountId: { expenses: [], budgetTotal: 0, currentFriday: null } }
+            let activeAccountId = 'gastos';
+            let nextId = 1; // global para todos los gastos (para mantener ids únicos)
             let pendingDeleteId = null;
 
-            // Elementos
+            // ===== ELEMENTOS DOM =====
             const landing = document.getElementById('landing');
             const entrarBtn = document.getElementById('entrarBtn');
+            const accountSelector = document.getElementById('accountSelector');
+            const accountGrid = document.getElementById('accountGrid');
+            const appContainer = document.getElementById('appContainer');
+            const changeAccountBtn = document.getElementById('changeAccountBtn');
+            const appTitle = document.getElementById('appTitle');
+            const appSubtitle = document.getElementById('appSubtitle');
+            const categoryDisplay = document.getElementById('categoryDisplay');
+            const budgetCategoryLabel = document.getElementById('budgetCategoryLabel');
+
             const notificationContainer = document.getElementById('notification-container');
             const modalOverlay = document.getElementById('confirmModal');
             const modalCancel = document.getElementById('modalCancel');
             const modalConfirm = document.getElementById('modalConfirm');
+
             const form = document.getElementById('expenseForm');
+            const typeSelect = document.getElementById('typeSelect');
             const descInput = document.getElementById('descriptionInput');
             const amountInput = document.getElementById('amountInput');
             const dateInput = document.getElementById('dateInput');
-            const totalExpensesEl = document.getElementById('totalExpenses');
+
             const reportListEl = document.getElementById('reportList');
+            const reportIncomeEl = document.getElementById('reportIncome');
+            const reportExpensesEl = document.getElementById('reportExpenses');
+            const reportBalanceEl = document.getElementById('reportBalance');
             const reportTotalEl = document.getElementById('reportTotal');
             const reportBaseEl = document.getElementById('reportBase');
             const reportRemainingEl = document.getElementById('reportRemaining');
             const reportCountEl = document.getElementById('reportCount');
+
             const applyFilterBtn = document.getElementById('applyFilterBtn');
             const clearFilterBtn = document.getElementById('clearFilterBtn');
             const weekRangeDisplay = document.getElementById('weekRangeDisplay');
             const weekPrev = document.getElementById('weekPrev');
             const weekNext = document.getElementById('weekNext');
             const weekToday = document.getElementById('weekToday');
+
             const budgetTotalInput = document.getElementById('budgetTotalInput');
             const saveBudgetsBtn = document.getElementById('saveBudgetsBtn');
             const resetBudgetsBtn = document.getElementById('resetBudgetsBtn');
-            const resetCycleBtn = document.getElementById('resetCycleBtn');
+
+            const historicoListEl = document.getElementById('historicoList');
+            const historicoTotalEl = document.getElementById('historicoTotal');
+            const historicoCountEl = document.getElementById('historicoCount');
+
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabPanels = document.querySelectorAll('.tab-panel');
 
-            // Selector personalizado
+            // Selector de fecha
             const customPicker = document.getElementById('customDatePicker');
             const dpPrev = document.getElementById('dpPrev');
             const dpNext = document.getElementById('dpNext');
@@ -1763,16 +1992,11 @@
             const dpGrid = document.getElementById('dpGrid');
             const dpToday = document.getElementById('dpToday');
 
-            // Histórico
-            const historicoListEl = document.getElementById('historicoList');
-            const historicoTotalEl = document.getElementById('historicoTotal');
-            const historicoCountEl = document.getElementById('historicoCount');
-
             let pickerCurrentMonth = new Date().getMonth();
             let pickerCurrentYear = new Date().getFullYear();
             let pickerSelectedDate = null;
 
-            // ---- Funciones auxiliares ----
+            // ===== FUNCIONES AUXILIARES =====
             function showNotification(message, type = 'info', duration = 3000) {
                 const element = document.createElement('div');
                 element.className = `notification ${type}`;
@@ -1838,39 +2062,129 @@
                 return { start, end };
             }
 
+            function escapeHtml(value) {
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            // ===== PERSISTENCIA =====
             function saveToLocal() {
-                localStorage.setItem('expenses_data', JSON.stringify(expenses));
-                localStorage.setItem('budget_total', String(budgetTotal));
+                const data = {
+                    accounts: accountsData,
+                    nextId: nextId
+                };
+                localStorage.setItem('multi_account_data', JSON.stringify(data));
             }
 
             function loadData() {
-                const storedExpenses = localStorage.getItem('expenses_data');
-                if (storedExpenses) {
+                const stored = localStorage.getItem('multi_account_data');
+                if (stored) {
                     try {
-                        const parsed = JSON.parse(storedExpenses);
-                        if (Array.isArray(parsed)) {
-                            expenses = parsed.map(item => ({ ...item, amount: Number(item.amount) }));
-                            const maxId = expenses.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0);
-                            nextId = maxId + 1;
+                        const parsed = JSON.parse(stored);
+                        if (parsed.accounts) {
+                            accountsData = parsed.accounts;
+                            // Asegurar que cada cuenta tenga los campos necesarios
+                            ACCOUNTS_CONFIG.forEach(acc => {
+                                if (!accountsData[acc.id]) {
+                                    accountsData[acc.id] = {
+                                        expenses: [],
+                                        budgetTotal: 0,
+                                        currentFriday: null
+                                    };
+                                } else {
+                                    if (!accountsData[acc.id].expenses) accountsData[acc.id].expenses = [];
+                                    if (typeof accountsData[acc.id].budgetTotal !== 'number') accountsData[acc.id].budgetTotal = 0;
+                                    // currentFriday puede ser null
+                                }
+                            });
+                            if (typeof parsed.nextId === 'number') nextId = parsed.nextId;
+                            else nextId = 1;
+                        } else {
+                            initDefaultAccounts();
                         }
-                    } catch (e) { expenses = []; }
+                    } catch (e) {
+                        initDefaultAccounts();
+                    }
+                } else {
+                    initDefaultAccounts();
                 }
-                const storedBudget = localStorage.getItem('budget_total');
-                if (storedBudget !== null) {
-                    const value = parseFloat(storedBudget);
-                    if (!isNaN(value) && value >= 0) budgetTotal = value;
+                // Asegurar que la cuenta activa existe
+                if (!accountsData[activeAccountId]) {
+                    activeAccountId = ACCOUNTS_CONFIG[0].id;
                 }
+                // Inicializar currentFriday para cada cuenta si es null
+                const today = getTodayDate();
+                ACCOUNTS_CONFIG.forEach(acc => {
+                    const data = accountsData[acc.id];
+                    if (!data.currentFriday) {
+                        data.currentFriday = getPreviousFriday(today).toISOString();
+                    }
+                });
                 saveToLocal();
             }
 
-            function getWeekExpenses(friday) {
+            function initDefaultAccounts() {
+                accountsData = {};
+                const today = getTodayDate();
+                ACCOUNTS_CONFIG.forEach(acc => {
+                    accountsData[acc.id] = {
+                        expenses: [],
+                        budgetTotal: 0,
+                        currentFriday: getPreviousFriday(today).toISOString()
+                    };
+                });
+                nextId = 1;
+            }
+
+            // ===== OBTENER DATOS DE LA CUENTA ACTIVA =====
+            function getActiveAccountData() {
+                return accountsData[activeAccountId];
+            }
+
+            function getActiveExpenses() {
+                return getActiveAccountData().expenses || [];
+            }
+
+            function getActiveBudget() {
+                return getActiveAccountData().budgetTotal || 0;
+            }
+
+            function getActiveFriday() {
+                const fridayStr = getActiveAccountData().currentFriday;
+                if (fridayStr) {
+                    const d = new Date(fridayStr);
+                    if (!isNaN(d.getTime())) return d;
+                }
+                const today = getTodayDate();
+                const friday = getPreviousFriday(today);
+                getActiveAccountData().currentFriday = friday.toISOString();
+                saveToLocal();
+                return friday;
+            }
+
+            function setActiveFriday(friday) {
+                getActiveAccountData().currentFriday = friday.toISOString();
+                saveToLocal();
+            }
+
+            function setActiveBudget(value) {
+                getActiveAccountData().budgetTotal = value;
+                saveToLocal();
+            }
+
+            // ===== FUNCIONES DE NEGOCIO =====
+            function getWeekExpenses(friday, expenses) {
                 const range = getWeekRange(friday);
                 const startKey = dateKey(range.start);
                 const endKey = dateKey(range.end);
                 return expenses.filter(item => item.date >= startKey && item.date <= endKey);
             }
 
-            function getWeeklyBudgetData(targetFriday) {
+            function getWeeklyBudgetData(targetFriday, budgetTotal, expenses) {
                 const initialWeeklyBudget = budgetTotal / WEEKS_PER_MONTH;
                 let firstFriday = getPreviousFriday(targetFriday);
                 if (expenses.length > 0) {
@@ -1886,8 +2200,10 @@
                 let currentWeek = new Date(firstFriday);
                 while (currentWeek <= targetFriday) {
                     const weeklyBudget = initialWeeklyBudget + accumulatedBalance;
-                    const weeklyExpenses = getWeekExpenses(currentWeek);
-                    const weeklyTotal = weeklyExpenses.reduce((sum, item) => sum + Number(item.amount), 0);
+                    const weeklyExpenses = getWeekExpenses(currentWeek, expenses);
+                    const weeklyTotal = weeklyExpenses.reduce((sum, item) => {
+                        return item.type === 'ingreso' ? sum - Number(item.amount) : sum + Number(item.amount);
+                    }, 0);
                     accumulatedBalance = weeklyBudget - weeklyTotal;
                     if (currentWeek.getTime() === targetFriday.getTime()) {
                         return { baseWeekly: weeklyBudget, total: weeklyTotal, remaining: accumulatedBalance };
@@ -1897,49 +2213,71 @@
                 return { baseWeekly: initialWeeklyBudget, total: 0, remaining: initialWeeklyBudget };
             }
 
-            function escapeHtml(value) {
-                return String(value)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
+            // ===== RENDER =====
+            function updateHeader() {
+                const config = ACCOUNTS_CONFIG.find(a => a.id === activeAccountId);
+                if (config) {
+                    appTitle.textContent = config.name;
+                    appSubtitle.textContent = config.icon + ' · Control semanal';
+                    categoryDisplay.textContent = config.defaultCategory || 'General';
+                    budgetCategoryLabel.textContent = config.icon + ' ' + config.name;
+                }
             }
 
             function updateWeekRangeDisplay() {
-                if (!currentFriday) return;
-                const range = getWeekRange(currentFriday);
+                const friday = getActiveFriday();
+                const range = getWeekRange(friday);
                 weekRangeDisplay.textContent = `${formatDate(range.start)} - ${formatDate(range.end)}`;
             }
 
             function renderReport() {
                 updateWeekRangeDisplay();
-                if (!currentFriday) return;
-                const filtered = getWeekExpenses(currentFriday);
-                const weeklyData = getWeeklyBudgetData(currentFriday);
-                reportListEl.innerHTML = '';
-                reportCountEl.textContent = filtered.length;
-                filtered.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'expense-item';
-                    card.innerHTML = `
-                        <div class="info">
-                            <span class="category-badge">${escapeHtml(item.category)}</span>
-                            <div class="description">${escapeHtml(item.description)}</div>
-                            <div class="meta">${escapeHtml(item.date)}</div>
-                        </div>
-                        <div class="amount">-${Number(item.amount).toFixed(2)} €</div>
-                    `;
-                    reportListEl.appendChild(card);
+                const friday = getActiveFriday();
+                const expenses = getActiveExpenses();
+                const budget = getActiveBudget();
+
+                // Calcular totales de ingresos y gastos de la semana
+                const weekExpenses = getWeekExpenses(friday, expenses);
+                let weekIncome = 0;
+                let weekOutcome = 0;
+                weekExpenses.forEach(item => {
+                    if (item.type === 'ingreso') weekIncome += Number(item.amount);
+                    else weekOutcome += Number(item.amount);
                 });
-                if (filtered.length === 0) {
-                    reportListEl.innerHTML = '<div class="empty-state">No hay gastos en esta semana.</div>';
+                const weekTotal = weekIncome - weekOutcome;
+
+                // Totales históricos de la cuenta
+                let totalIncome = 0;
+                let totalExpense = 0;
+                expenses.forEach(item => {
+                    if (item.type === 'ingreso') totalIncome += Number(item.amount);
+                    else totalExpense += Number(item.amount);
+                });
+                const balance = totalIncome - totalExpense;
+
+                // Presupuesto semanal
+                const weeklyData = getWeeklyBudgetData(friday, budget, expenses);
+
+                reportIncomeEl.textContent = totalIncome.toFixed(2) + ' €';
+                reportExpensesEl.textContent = totalExpense.toFixed(2) + ' €';
+                reportBalanceEl.textContent = balance.toFixed(2) + ' €';
+                if (balance >= 0) {
+                    reportBalanceEl.className = 'value positive';
+                } else {
+                    reportBalanceEl.className = 'value negative';
                 }
-                reportTotalEl.textContent = weeklyData.total.toFixed(2) + ' €';
+
+                reportTotalEl.textContent = weekTotal.toFixed(2) + ' €';
+                if (weekTotal >= 0) {
+                    reportTotalEl.className = 'value positive';
+                } else {
+                    reportTotalEl.className = 'value negative';
+                }
+
                 reportBaseEl.textContent = weeklyData.baseWeekly.toFixed(2) + ' €';
                 reportRemainingEl.textContent = weeklyData.remaining.toFixed(2) + ' €';
                 if (weeklyData.remaining < 0) {
-                    reportRemainingEl.className = 'value';
+                    reportRemainingEl.className = 'value negative';
                     reportRemainingEl.style.color = 'var(--danger)';
                     reportRemainingEl.style.textShadow = '0 0 20px rgba(244, 63, 94, 0.4)';
                 } else {
@@ -1947,824 +2285,44 @@
                     reportRemainingEl.style.color = '';
                     reportRemainingEl.style.textShadow = '';
                 }
-            }
 
-            function renderHistorico() {
-                historicoListEl.innerHTML = '';
-                historicoCountEl.textContent = expenses.length;
-                if (expenses.length === 0) {
-                    historicoListEl.innerHTML = '<div class="empty-state">No hay gastos registrados aún.</div>';
-                    historicoTotalEl.textContent = '0,00 €';
-                    totalExpensesEl.textContent = '0,00 €';  // también actualiza el total acumulado en reporte
-                    return;
-                }
-                let total = 0;
-                const sorted = [...expenses].sort((a, b) => {
-                    if (a.date < b.date) return 1;
-                    if (a.date > b.date) return -1;
-                    return b.id - a.id;
-                });
-                sorted.forEach(item => {
-                    total += Number(item.amount);
-                    const card = document.createElement('div');
-                    card.className = 'expense-item';
-                    card.innerHTML = `
-                        <div class="info">
-                            <span class="category-badge">${escapeHtml(item.category)}</span>
-                            <div class="description">${escapeHtml(item.description)}</div>
-                            <div class="meta">${escapeHtml(item.date)}</div>
-                        </div>
-                        <div class="amount">-${Number(item.amount).toFixed(2)} €</div>
-                        <button class="delete-btn" data-id="${item.id}" aria-label="Eliminar gasto">✕</button>
-                    `;
-                    historicoListEl.appendChild(card);
-                });
-                historicoTotalEl.textContent = total.toFixed(2) + ' €';
-                totalExpensesEl.textContent = total.toFixed(2) + ' €';  // actualiza el total acumulado en reporte
-                historicoListEl.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', event => {
-                        const id = Number(event.currentTarget.getAttribute('data-id'));
-                        showConfirmModal(id);
-                    });
-                });
-            }
-
-            function showConfirmModal(expenseId) {
-                pendingDeleteId = expenseId;
-                modalOverlay.classList.add('active');
-            }
-
-            function hideConfirmModal() {
-                modalOverlay.classList.remove('active');
-                pendingDeleteId = null;
-            }
-
-            // ---- Selector de fecha ----
-            function renderPicker() {
-                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                dpMonthYear.textContent = `${monthNames[pickerCurrentMonth]} ${pickerCurrentYear}`;
-                const firstDay = new Date(pickerCurrentYear, pickerCurrentMonth, 1);
-                const daysInMonth = new Date(pickerCurrentYear, pickerCurrentMonth + 1, 0).getDate();
-                const startDayOfWeek = firstDay.getDay();
-                let startOffset = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
-                const today = getTodayDate();
-                const todayStr = dateKey(today);
-                let selectedStr = null;
-                if (pickerSelectedDate) selectedStr = dateKey(pickerSelectedDate);
-                dpGrid.innerHTML = '';
-                for (let i = 0; i < 42; i++) {
-                    const dayNumber = i - startOffset + 1;
-                    const dateObj = new Date(pickerCurrentYear, pickerCurrentMonth, dayNumber);
-                    const cell = document.createElement('div');
-                    cell.className = 'dp-day';
-                    if (dayNumber < 1 || dayNumber > daysInMonth) {
-                        cell.classList.add('other-month');
-                        const otherMonthDate = new Date(pickerCurrentYear, pickerCurrentMonth, dayNumber);
-                        cell.textContent = otherMonthDate.getDate();
-                    } else {
-                        cell.textContent = dayNumber;
-                        const cellDateStr = dateKey(dateObj);
-                        if (cellDateStr === todayStr) cell.classList.add('today');
-                        if (cellDateStr === selectedStr) cell.classList.add('selected');
-                    }
-                    cell.dataset.date = dateKey(dateObj);
-                    cell.addEventListener('click', function () {
-                        const parts = this.dataset.date.split('-').map(Number);
-                        const selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                        selectDate(selectedDate);
-                    });
-                    dpGrid.appendChild(cell);
-                }
-            }
-
-            function selectDate(date) {
-                pickerSelectedDate = new Date(date);
-                pickerSelectedDate.setHours(0, 0, 0, 0);
-                const year = pickerSelectedDate.getFullYear();
-                const month = String(pickerSelectedDate.getMonth() + 1).padStart(2, '0');
-                const day = String(pickerSelectedDate.getDate()).padStart(2, '0');
-                dateInput.value = `${year}-${month}-${day}`;
-                customPicker.classList.remove('active');
-                pickerCurrentMonth = pickerSelectedDate.getMonth();
-                pickerCurrentYear = pickerSelectedDate.getFullYear();
-                renderPicker();
-            }
-
-            function togglePicker(show) {
-                if (show) {
-                    if (dateInput.value) {
-                        const parts = dateInput.value.split('-').map(Number);
-                        if (parts.length === 3) {
-                            const d = new Date(parts[0], parts[1] - 1, parts[2]);
-                            if (!isNaN(d.getTime())) {
-                                pickerSelectedDate = d;
-                                pickerCurrentMonth = d.getMonth();
-                                pickerCurrentYear = d.getFullYear();
-                            }
-                        }
-                    }
-                    renderPicker();
-                    customPicker.classList.add('active');
+                // Lista de transacciones de la semana
+                reportListEl.innerHTML = '';
+                reportCountEl.textContent = weekExpenses.length;
+                if (weekExpenses.length === 0) {
+                    reportListEl.innerHTML = '<div class="empty-state">No hay transacciones en esta semana.</div>';
                 } else {
-                    customPicker.classList.remove('active');
-                }
-            }
-
-            function goToTodayInPicker() {
-                const today = getTodayDate();
-                pickerSelectedDate = new Date(today);
-                pickerCurrentMonth = today.getMonth();
-                pickerCurrentYear = today.getFullYear();
-                selectDate(today);
-            }
-
-            // ---- Eventos ----
-            // Botón Empezar (corregido para móviles)
-            if (entrarBtn) {
-                entrarBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (landing) {
-                        landing.style.display = 'none';
-                        landing.classList.add('hidden');
-                    }
-                });
-            }
-
-            // Resto de eventos
-            if (modalCancel) modalCancel.addEventListener('click', hideConfirmModal);
-            if (modalConfirm) {
-                modalConfirm.addEventListener('click', function () {
-                    if (pendingDeleteId === null) return;
-                    expenses = expenses.filter(item => Number(item.id) !== pendingDeleteId);
-                    saveToLocal();
-                    renderHistorico();
-                    renderReport();
-                    showNotification('Gasto eliminado correctamente', 'success');
-                    hideConfirmModal();
-                });
-            }
-            if (modalOverlay) {
-                modalOverlay.addEventListener('click', function (e) {
-                    if (e.target === modalOverlay) hideConfirmModal();
-                });
-            }
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('active')) {
-                    hideConfirmModal();
-                }
-            });
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const tabId = this.getAttribute('data-tab');
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabPanels.forEach(panel => panel.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const description = descInput.value.trim();
-                    const amountText = amountInput.value.trim();
-                    const date = dateInput.value;
-                    if (!description || !amountText || !date) {
-                        showNotification('Por favor completa todos los campos', 'error');
-                        return;
-                    }
-                    const amount = parseFloat(amountText);
-                    if (isNaN(amount) || amount <= 0) {
-                        showNotification('Introduce un monto válido', 'error');
-                        return;
-                    }
-                    expenses.unshift({
-                        id: nextId++,
-                        category: CATEGORY,
-                        description,
-                        amount,
-                        date
+                    // Ordenar por fecha descendente
+                    const sorted = [...weekExpenses].sort((a, b) => {
+                        if (a.date < b.date) return 1;
+                        if (a.date > b.date) return -1;
+                        return b.id - a.id;
                     });
-                    saveToLocal();
-                    renderHistorico();
-                    renderReport();
-                    descInput.value = '';
-                    amountInput.value = '';
-                    showNotification('Gasto añadido correctamente', 'success');
-                });
-            }
-
-            if (weekPrev) {
-                weekPrev.addEventListener('click', function () {
-                    currentFriday = addWeeksToFriday(currentFriday, -1);
-                    renderReport();
-                });
-            }
-            if (weekNext) {
-                weekNext.addEventListener('click', function () {
-                    currentFriday = addWeeksToFriday(currentFriday, 1);
-                    renderReport();
-                });
-            }
-            if (weekToday) {
-                weekToday.addEventListener('click', function () {
-                    currentFriday = getPreviousFriday(getTodayDate());
-                    renderReport();
-                });
-            }
-            if (applyFilterBtn) {
-                applyFilterBtn.addEventListener('click', function () {
-                    renderReport();
-                    showNotification('Filtro aplicado', 'info');
-                });
-            }
-            if (clearFilterBtn) {
-                clearFilterBtn.addEventListener('click', function () {
-                    currentFriday = getPreviousFriday(getTodayDate());
-                    renderReport();
-                    showNotification('Filtro restablecido a hoy', 'info');
-                });
-            }
-
-            if (budgetTotalInput) {
-                budgetTotalInput.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter' && saveBudgetsBtn) saveBudgetsBtn.click();
-                });
-            }
-            if (saveBudgetsBtn) {
-                saveBudgetsBtn.addEventListener('click', function () {
-                    const value = parseFloat(budgetTotalInput.value.trim());
-                    if (isNaN(value) || value < 0) {
-                        showNotification('Monto de presupuesto no válido', 'error');
-                        return;
-                    }
-                    budgetTotal = value;
-                    saveToLocal();
-                    renderReport();
-                    showNotification('Presupuesto guardado', 'success');
-                });
-            }
-            if (resetBudgetsBtn) {
-                resetBudgetsBtn.addEventListener('click', function () {
-                    budgetTotal = 0;
-                    budgetTotalInput.value = '';
-                    saveToLocal();
-                    renderReport();
-                    showNotification('Presupuesto restablecido a 0', 'info');
-                });
-            }
-
-            // Reiniciar ciclo
-            if (resetCycleBtn) {
-                resetCycleBtn.addEventListener('click', function () {
-                    budgetTotal = 0;
-                    budgetTotalInput.value = '';
-                    currentFriday = getPreviousFriday(getTodayDate());
-                    saveToLocal();
-                    renderReport();
-                    renderHistorico();
-                    showNotification('Ciclo reiniciado correctamente', 'success');
-                });
-            }
-
-            // Selector de fecha
-            if (dateInput) {
-                dateInput.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    const isActive = customPicker.classList.contains('active');
-                    togglePicker(!isActive);
-                });
-            }
-            if (dpPrev) {
-                dpPrev.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    if (pickerCurrentMonth === 0) {
-                        pickerCurrentMonth = 11;
-                        pickerCurrentYear--;
-                    } else {
-                        pickerCurrentMonth--;
-                    }
-                    renderPicker();
-                });
-            }
-            if (dpNext) {
-                dpNext.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    if (pickerCurrentMonth === 11) {
-                        pickerCurrentMonth = 0;
-                        pickerCurrentYear++;
-                    } else {
-                        pickerCurrentMonth++;
-                    }
-                    renderPicker();
-                });
-            }
-            if (dpToday) {
-                dpToday.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    goToTodayInPicker();
-                });
-            }
-            document.addEventListener('click', function (e) {
-                const wrapper = document.querySelector('.date-picker-wrapper');
-                if (wrapper && !wrapper.contains(e.target)) {
-                    customPicker.classList.remove('active');
-                }
-            });
-
-            // ---- Inicialización ----
-            const todayStr = getToday();
-            dateInput.value = todayStr;
-            const todayDate = getTodayDate();
-            pickerSelectedDate = new Date(todayDate);
-            pickerCurrentMonth = todayDate.getMonth();
-            pickerCurrentYear = todayDate.getFullYear();
-            renderPicker();
-
-            currentFriday = getPreviousFriday(getTodayDate());
-            loadData();
-            budgetTotalInput.value = budgetTotal > 0 ? budgetTotal : '';
-
-            renderHistorico();
-            renderReport();
-        })();
-    </script>
-</body>
-</html>
-
-            <div class="form-card">
-                <form id="expenseForm" autocomplete="off">
-
-                    <div class="form-row">
-
-                        <div class="form-group">
-                            <label for="categoryStatic">Categoría</label>
-                            <div class="category-static">Alimentación</div>
-                            <input type="hidden" id="categoryInput" value="Alimentación">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="descriptionInput">Descripción</label>
-                            <input
-                                type="text"
-                                id="descriptionInput"
-                                placeholder="Descripción (ej. Supermercado)"
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label for="amountInput">Monto (€)</label>
-                            <input
-                                type="number"
-                                id="amountInput"
-                                placeholder="Monto € (0,00)"
-                                step="0.01"
-                                min="0.01"
-                            >
-                        </div>
-
-                        <!-- SELECTOR DE FECHA PERSONALIZADO -->
-                        <div class="form-group">
-                            <label for="dateInput">Fecha</label>
-                            <div class="date-picker-wrapper">
-                                <input
-                                    type="text"
-                                    id="dateInput"
-                                    readonly
-                                    placeholder="Seleccionar fecha"
-                                    value=""
-                                >
-                                <div id="customDatePicker" class="date-picker-popup">
-                                    <div class="dp-header">
-                                        <button id="dpPrev" type="button">‹</button>
-                                        <span id="dpMonthYear" class="dp-month-year">Enero 2026</span>
-                                        <button id="dpNext" type="button">›</button>
-                                    </div>
-                                    <div class="dp-weekdays">
-                                        <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
-                                    </div>
-                                    <div id="dpGrid" class="dp-grid"></div>
-                                    <div class="dp-actions">
-                                        <button id="dpToday" type="button">Hoy</button>
-                                    </div>
-                                </div>
+                    sorted.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'expense-item';
+                        const amountClass = item.type === 'ingreso' ? 'income' : 'expense';
+                        const sign = item.type === 'ingreso' ? '+' : '-';
+                        card.innerHTML = `
+                            <div class="info">
+                                <span class="category-badge">${escapeHtml(item.category)}</span>
+                                <div class="description">${escapeHtml(item.description)}</div>
+                                <div class="meta">${escapeHtml(item.date)} · ${escapeHtml(item.type)}</div>
                             </div>
-                        </div>
-                        <!-- FIN SELECTOR -->
-
-                        <button type="submit" class="btn-add">
-                            ＋ Añadir gasto
-                        </button>
-
-                    </div>
-                </form>
-            </div>
-
-        </div>
-
-        <!-- ===== PESTAÑA REPORTE ===== -->
-        <div class="tab-panel" id="tab2" role="tabpanel">
-
-            <div class="summary-card" id="reportSummary">
-
-                <!-- NUEVA FILA: Gasto acumulado (total histórico) -->
-                <div class="row">
-                    <span class="label">Gasto acumulado</span>
-                    <span class="value" id="totalExpenses">0,00 €</span>
-                </div>
-
-                <div class="row">
-                    <span class="label">Total semana</span>
-                    <span class="value" id="reportTotal">0,00 €</span>
-                </div>
-
-                <div class="row">
-                    <span class="label">Presupuesto disponible</span>
-                    <span
-                        class="value"
-                        id="reportBase"
-                        style="color:var(--muted);font-size:16px;"
-                    >
-                        0,00 €
-                    </span>
-                </div>
-
-                <div class="row">
-                    <span class="label">Resto disponible</span>
-                    <span class="value positive" id="reportRemaining">
-                        0,00 €
-                    </span>
-                </div>
-
-            </div>
-
-            <div class="filter-section">
-
-                <div class="filter-title">Filtro por semana</div>
-
-                <div class="filter-grid">
-
-                    <div class="filter-group">
-                        <div class="week-selector">
-
-                            <button class="week-nav-btn" id="weekPrev">
-                                ‹
-                            </button>
-
-                            <span class="week-range-text" id="weekRangeDisplay">
-                                Cargando...
-                            </span>
-
-                            <button class="week-nav-btn" id="weekNext">
-                                ›
-                            </button>
-
-                            <button class="week-today-btn" id="weekToday">
-                                Hoy
-                            </button>
-
-                        </div>
-                    </div>
-
-                    <div class="filter-actions">
-                        <button class="btn-filter" id="applyFilterBtn">
-                            Aplicar filtro
-                        </button>
-
-                        <button
-                            class="btn-filter"
-                            id="clearFilterBtn"
-                            style="background:var(--surface-subtle);color:var(--muted);"
-                        >
-                            Limpiar
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="list-header">
-                <h2>Resultados</h2>
-                <span class="count" id="reportCount">0</span>
-            </div>
-
-            <div class="expense-list" id="reportList"></div>
-        </div>
-
-        <!-- ===== PESTAÑA AJUSTES ===== -->
-        <div class="tab-panel" id="tab3" role="tabpanel">
-
-            <div class="budget-card">
-
-                <h2 class="budget-title">Presupuesto mensual</h2>
-
-                <p class="budget-description">
-                    Define el presupuesto total. La app lo divide automáticamente
-                    en 5 semanas fijas. Los sobrantes y excesos se trasladan a la
-                    semana siguiente.
-                </p>
-
-                <div class="budget-item">
-                    <span class="budget-category">
-                        🍽️ Alimentación
-                    </span>
-
-                    <div class="budget-input">
-                        <input
-                            type="number"
-                            id="budgetTotalInput"
-                            step="0.01"
-                            min="0"
-                            placeholder="0,00 €"
-                        >
-                    </div>
-                </div>
-
-                <div class="budget-actions">
-
-                    <button class="btn-save-budgets" id="saveBudgetsBtn">
-                        Guardar presupuesto
-                    </button>
-
-                    <button class="btn-reset-budgets" id="resetBudgetsBtn">
-                        Restablecer a 0
-                    </button>
-
-                    <!-- Botón para reiniciar ciclo (opcional) -->
-                    <button class="btn-reset-budgets" id="resetCycleBtn" style="border-color: var(--warning); color: var(--warning);">
-                        Reiniciar ciclo
-                    </button>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== PESTAÑA HISTÓRICO ===== -->
-        <div class="tab-panel" id="tab4" role="tabpanel">
-
-            <div class="summary-card">
-                <div class="row">
-                    <span class="label">Total histórico</span>
-                    <span class="value" id="historicoTotal">0,00 €</span>
-                </div>
-            </div>
-
-            <div class="list-header">
-                <h2>Todos los gastos</h2>
-                <span class="count" id="historicoCount">0</span>
-            </div>
-
-            <div class="expense-list" id="historicoList"></div>
-        </div>
-
-    </div>
-
-    <script>
-        (function () {
-            'use strict';
-
-            const CATEGORY = 'Alimentación';
-            const WEEKS_PER_MONTH = 5;
-
-            let expenses = [];
-            let nextId = 1;
-            let budgetTotal = 0;
-            let currentFriday = null;
-            let pendingDeleteId = null;
-
-            // Elementos
-            const landing = document.getElementById('landing');
-            const entrarBtn = document.getElementById('entrarBtn');
-            const notificationContainer = document.getElementById('notification-container');
-            const modalOverlay = document.getElementById('confirmModal');
-            const modalCancel = document.getElementById('modalCancel');
-            const modalConfirm = document.getElementById('modalConfirm');
-            const form = document.getElementById('expenseForm');
-            const descInput = document.getElementById('descriptionInput');
-            const amountInput = document.getElementById('amountInput');
-            const dateInput = document.getElementById('dateInput');
-            const totalExpensesEl = document.getElementById('totalExpenses');
-            const reportListEl = document.getElementById('reportList');
-            const reportTotalEl = document.getElementById('reportTotal');
-            const reportBaseEl = document.getElementById('reportBase');
-            const reportRemainingEl = document.getElementById('reportRemaining');
-            const reportCountEl = document.getElementById('reportCount');
-            const applyFilterBtn = document.getElementById('applyFilterBtn');
-            const clearFilterBtn = document.getElementById('clearFilterBtn');
-            const weekRangeDisplay = document.getElementById('weekRangeDisplay');
-            const weekPrev = document.getElementById('weekPrev');
-            const weekNext = document.getElementById('weekNext');
-            const weekToday = document.getElementById('weekToday');
-            const budgetTotalInput = document.getElementById('budgetTotalInput');
-            const saveBudgetsBtn = document.getElementById('saveBudgetsBtn');
-            const resetBudgetsBtn = document.getElementById('resetBudgetsBtn');
-            const resetCycleBtn = document.getElementById('resetCycleBtn');
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabPanels = document.querySelectorAll('.tab-panel');
-
-            // Selector personalizado
-            const customPicker = document.getElementById('customDatePicker');
-            const dpPrev = document.getElementById('dpPrev');
-            const dpNext = document.getElementById('dpNext');
-            const dpMonthYear = document.getElementById('dpMonthYear');
-            const dpGrid = document.getElementById('dpGrid');
-            const dpToday = document.getElementById('dpToday');
-
-            // Histórico
-            const historicoListEl = document.getElementById('historicoList');
-            const historicoTotalEl = document.getElementById('historicoTotal');
-            const historicoCountEl = document.getElementById('historicoCount');
-
-            let pickerCurrentMonth = new Date().getMonth();
-            let pickerCurrentYear = new Date().getFullYear();
-            let pickerSelectedDate = null;
-
-            // ---- Funciones auxiliares ----
-            function showNotification(message, type = 'info', duration = 3000) {
-                const element = document.createElement('div');
-                element.className = `notification ${type}`;
-                element.textContent = message;
-                notificationContainer.appendChild(element);
-                setTimeout(() => {
-                    element.classList.add('hide');
-                    setTimeout(() => {
-                        if (element.parentNode) element.remove();
-                    }, 300);
-                }, duration);
-            }
-
-            function getTodayDate() {
-                const date = new Date();
-                return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            }
-
-            function getToday() {
-                const date = getTodayDate();
-                return date.getFullYear() + '-' +
-                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                    String(date.getDate()).padStart(2, '0');
-            }
-
-            function parseLocalDate(dateString) {
-                const parts = dateString.split('-').map(Number);
-                return new Date(parts[0], parts[1] - 1, parts[2]);
-            }
-
-            function dateKey(date) {
-                return date.getFullYear() + '-' +
-                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                    String(date.getDate()).padStart(2, '0');
-            }
-
-            function formatDate(date) {
-                return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-            }
-
-            function getPreviousFriday(date) {
-                const result = new Date(date);
-                const day = result.getDay();
-                const difference = day >= 5 ? day - 5 : day + 2;
-                result.setDate(result.getDate() - difference);
-                result.setHours(0, 0, 0, 0);
-                return result;
-            }
-
-            function addWeeksToFriday(friday, weeks) {
-                const result = new Date(friday);
-                result.setDate(result.getDate() + weeks * 7);
-                result.setHours(0, 0, 0, 0);
-                return result;
-            }
-
-            function getWeekRange(friday) {
-                const start = new Date(friday);
-                const end = new Date(friday);
-                start.setHours(0, 0, 0, 0);
-                end.setDate(end.getDate() + 6);
-                end.setHours(0, 0, 0, 0);
-                return { start, end };
-            }
-
-            function saveToLocal() {
-                localStorage.setItem('expenses_data', JSON.stringify(expenses));
-                localStorage.setItem('budget_total', String(budgetTotal));
-            }
-
-            function loadData() {
-                const storedExpenses = localStorage.getItem('expenses_data');
-                if (storedExpenses) {
-                    try {
-                        const parsed = JSON.parse(storedExpenses);
-                        if (Array.isArray(parsed)) {
-                            expenses = parsed.map(item => ({ ...item, amount: Number(item.amount) }));
-                            const maxId = expenses.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0);
-                            nextId = maxId + 1;
-                        }
-                    } catch (e) { expenses = []; }
-                }
-                const storedBudget = localStorage.getItem('budget_total');
-                if (storedBudget !== null) {
-                    const value = parseFloat(storedBudget);
-                    if (!isNaN(value) && value >= 0) budgetTotal = value;
-                }
-                saveToLocal();
-            }
-
-            function getWeekExpenses(friday) {
-                const range = getWeekRange(friday);
-                const startKey = dateKey(range.start);
-                const endKey = dateKey(range.end);
-                return expenses.filter(item => item.date >= startKey && item.date <= endKey);
-            }
-
-            function getWeeklyBudgetData(targetFriday) {
-                const initialWeeklyBudget = budgetTotal / WEEKS_PER_MONTH;
-                let firstFriday = getPreviousFriday(targetFriday);
-                if (expenses.length > 0) {
-                    const expenseDates = expenses
-                        .map(item => parseLocalDate(item.date))
-                        .filter(date => !isNaN(date.getTime()));
-                    if (expenseDates.length > 0) {
-                        const firstExpenseTime = Math.min(...expenseDates.map(date => date.getTime()));
-                        firstFriday = getPreviousFriday(new Date(firstExpenseTime));
-                    }
-                }
-                let accumulatedBalance = 0;
-                let currentWeek = new Date(firstFriday);
-                while (currentWeek <= targetFriday) {
-                    const weeklyBudget = initialWeeklyBudget + accumulatedBalance;
-                    const weeklyExpenses = getWeekExpenses(currentWeek);
-                    const weeklyTotal = weeklyExpenses.reduce((sum, item) => sum + Number(item.amount), 0);
-                    accumulatedBalance = weeklyBudget - weeklyTotal;
-                    if (currentWeek.getTime() === targetFriday.getTime()) {
-                        return { baseWeekly: weeklyBudget, total: weeklyTotal, remaining: accumulatedBalance };
-                    }
-                    currentWeek = addWeeksToFriday(currentWeek, 1);
-                }
-                return { baseWeekly: initialWeeklyBudget, total: 0, remaining: initialWeeklyBudget };
-            }
-
-            function escapeHtml(value) {
-                return String(value)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-            }
-
-            function updateWeekRangeDisplay() {
-                if (!currentFriday) return;
-                const range = getWeekRange(currentFriday);
-                weekRangeDisplay.textContent = `${formatDate(range.start)} - ${formatDate(range.end)}`;
-            }
-
-            function renderReport() {
-                updateWeekRangeDisplay();
-                if (!currentFriday) return;
-                const filtered = getWeekExpenses(currentFriday);
-                const weeklyData = getWeeklyBudgetData(currentFriday);
-                reportListEl.innerHTML = '';
-                reportCountEl.textContent = filtered.length;
-                filtered.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'expense-item';
-                    card.innerHTML = `
-                        <div class="info">
-                            <span class="category-badge">${escapeHtml(item.category)}</span>
-                            <div class="description">${escapeHtml(item.description)}</div>
-                            <div class="meta">${escapeHtml(item.date)}</div>
-                        </div>
-                        <div class="amount">-${Number(item.amount).toFixed(2)} €</div>
-                    `;
-                    reportListEl.appendChild(card);
-                });
-                if (filtered.length === 0) {
-                    reportListEl.innerHTML = '<div class="empty-state">No hay gastos en esta semana.</div>';
-                }
-                reportTotalEl.textContent = weeklyData.total.toFixed(2) + ' €';
-                reportBaseEl.textContent = weeklyData.baseWeekly.toFixed(2) + ' €';
-                reportRemainingEl.textContent = weeklyData.remaining.toFixed(2) + ' €';
-                if (weeklyData.remaining < 0) {
-                    reportRemainingEl.className = 'value';
-                    reportRemainingEl.style.color = 'var(--danger)';
-                    reportRemainingEl.style.textShadow = '0 0 20px rgba(244, 63, 94, 0.4)';
-                } else {
-                    reportRemainingEl.className = 'value positive';
-                    reportRemainingEl.style.color = '';
-                    reportRemainingEl.style.textShadow = '';
+                            <div class="amount ${amountClass}">${sign}${Number(item.amount).toFixed(2)} €</div>
+                        `;
+                        reportListEl.appendChild(card);
+                    });
                 }
             }
 
             function renderHistorico() {
+                const expenses = getActiveExpenses();
                 historicoListEl.innerHTML = '';
                 historicoCountEl.textContent = expenses.length;
                 if (expenses.length === 0) {
-                    historicoListEl.innerHTML = '<div class="empty-state">No hay gastos registrados aún.</div>';
+                    historicoListEl.innerHTML = '<div class="empty-state">No hay transacciones registradas.</div>';
                     historicoTotalEl.textContent = '0,00 €';
-                    totalExpensesEl.textContent = '0,00 €';  // también actualiza el total acumulado en reporte
                     return;
                 }
                 let total = 0;
@@ -2774,30 +2332,95 @@
                     return b.id - a.id;
                 });
                 sorted.forEach(item => {
-                    total += Number(item.amount);
+                    total += (item.type === 'ingreso' ? Number(item.amount) : -Number(item.amount));
                     const card = document.createElement('div');
                     card.className = 'expense-item';
+                    const amountClass = item.type === 'ingreso' ? 'income' : 'expense';
+                    const sign = item.type === 'ingreso' ? '+' : '-';
                     card.innerHTML = `
                         <div class="info">
                             <span class="category-badge">${escapeHtml(item.category)}</span>
                             <div class="description">${escapeHtml(item.description)}</div>
-                            <div class="meta">${escapeHtml(item.date)}</div>
+                            <div class="meta">${escapeHtml(item.date)} · ${escapeHtml(item.type)}</div>
                         </div>
-                        <div class="amount">-${Number(item.amount).toFixed(2)} €</div>
-                        <button class="delete-btn" data-id="${item.id}" aria-label="Eliminar gasto">✕</button>
+                        <div class="amount ${amountClass}">${sign}${Number(item.amount).toFixed(2)} €</div>
+                        <button class="delete-btn" data-id="${item.id}" aria-label="Eliminar">✕</button>
                     `;
                     historicoListEl.appendChild(card);
                 });
                 historicoTotalEl.textContent = total.toFixed(2) + ' €';
-                totalExpensesEl.textContent = total.toFixed(2) + ' €';  // actualiza el total acumulado en reporte
-                historicoListEl.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', event => {
-                        const id = Number(event.currentTarget.getAttribute('data-id'));
+                historicoListEl.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const id = Number(this.getAttribute('data-id'));
                         showConfirmModal(id);
                     });
                 });
             }
 
+            function refreshAll() {
+                updateHeader();
+                renderReport();
+                renderHistorico();
+                // Actualizar campo de presupuesto
+                const budget = getActiveBudget();
+                budgetTotalInput.value = budget > 0 ? budget : '';
+                // Actualizar fecha del picker si está visible
+            }
+
+            // ===== SELECCIONAR CUENTA =====
+            function selectAccount(accountId) {
+                activeAccountId = accountId;
+                // Ocultar selector, mostrar app
+                accountSelector.classList.remove('visible');
+                appContainer.style.display = 'block';
+                // Asegurar que la cuenta tenga datos
+                if (!accountsData[accountId]) {
+                    accountsData[accountId] = {
+                        expenses: [],
+                        budgetTotal: 0,
+                        currentFriday: getPreviousFriday(getTodayDate()).toISOString()
+                    };
+                    saveToLocal();
+                }
+                refreshAll();
+                // Cambiar a la primera pestaña
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanels.forEach(p => p.classList.remove('active'));
+                document.querySelector('[data-tab="tab1"]').classList.add('active');
+                document.getElementById('tab1').classList.add('active');
+                showNotification(`Cuenta cambiada a ${ACCOUNTS_CONFIG.find(a=>a.id===accountId).name}`, 'success');
+            }
+
+            // ===== MOSTRAR SELECTOR DE CUENTAS =====
+            function showAccountSelector() {
+                // Generar tarjetas
+                accountGrid.innerHTML = '';
+                const today = getTodayDate();
+                ACCOUNTS_CONFIG.forEach(acc => {
+                    const data = accountsData[acc.id] || { expenses: [], budgetTotal: 0 };
+                    const expenses = data.expenses || [];
+                    let balance = 0;
+                    expenses.forEach(item => {
+                        if (item.type === 'ingreso') balance += Number(item.amount);
+                        else balance -= Number(item.amount);
+                    });
+                    const card = document.createElement('div');
+                    card.className = 'account-card';
+                    card.innerHTML = `
+                        <span class="icon">${acc.icon}</span>
+                        <div class="name">${acc.name}</div>
+                        <span class="balance ${balance >= 0 ? 'positive' : 'negative'}">
+                            ${balance.toFixed(2)} €
+                        </span>
+                    `;
+                    card.addEventListener('click', () => selectAccount(acc.id));
+                    accountGrid.appendChild(card);
+                });
+                accountSelector.classList.add('visible');
+                appContainer.style.display = 'none';
+            }
+
+            // ===== CONFIRMACIÓN DE ELIMINACIÓN =====
             function showConfirmModal(expenseId) {
                 pendingDeleteId = expenseId;
                 modalOverlay.classList.add('active');
@@ -2808,10 +2431,11 @@
                 pendingDeleteId = null;
             }
 
-            // ---- Selector de fecha ----
+            // ===== SELECTOR DE FECHA =====
             function renderPicker() {
                 const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ];
                 dpMonthYear.textContent = `${monthNames[pickerCurrentMonth]} ${pickerCurrentYear}`;
                 const firstDay = new Date(pickerCurrentYear, pickerCurrentMonth, 1);
                 const daysInMonth = new Date(pickerCurrentYear, pickerCurrentMonth + 1, 0).getDate();
@@ -2888,28 +2512,37 @@
                 selectDate(today);
             }
 
-            // ---- Eventos ----
-            // Botón Empezar (corregido para móviles)
+            // ===== EVENTOS =====
+            // Landing
             if (entrarBtn) {
                 entrarBtn.addEventListener('click', function (e) {
                     e.preventDefault();
-                    if (landing) {
-                        landing.style.display = 'none';
-                        landing.classList.add('hidden');
-                    }
+                    landing.classList.add('hidden');
+                    // Cargar datos y mostrar selector
+                    loadData();
+                    showAccountSelector();
                 });
             }
 
-            // Resto de eventos
+            // Cambiar cuenta desde header
+            if (changeAccountBtn) {
+                changeAccountBtn.addEventListener('click', function () {
+                    showAccountSelector();
+                });
+            }
+
+            // Modal
             if (modalCancel) modalCancel.addEventListener('click', hideConfirmModal);
             if (modalConfirm) {
                 modalConfirm.addEventListener('click', function () {
                     if (pendingDeleteId === null) return;
-                    expenses = expenses.filter(item => Number(item.id) !== pendingDeleteId);
+                    const expenses = getActiveExpenses();
+                    const updated = expenses.filter(item => Number(item.id) !== pendingDeleteId);
+                    getActiveAccountData().expenses = updated;
                     saveToLocal();
-                    renderHistorico();
                     renderReport();
-                    showNotification('Gasto eliminado correctamente', 'success');
+                    renderHistorico();
+                    showNotification('Transacción eliminada', 'success');
                     hideConfirmModal();
                 });
             }
@@ -2924,6 +2557,7 @@
                 }
             });
 
+            // Tabs
             tabButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     const tabId = this.getAttribute('data-tab');
@@ -2934,12 +2568,16 @@
                 });
             });
 
+            // Formulario
             if (form) {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
                     const description = descInput.value.trim();
                     const amountText = amountInput.value.trim();
                     const date = dateInput.value;
+                    const type = typeSelect.value;
+                    const category = ACCOUNTS_CONFIG.find(a => a.id === activeAccountId).defaultCategory || 'General';
+
                     if (!description || !amountText || !date) {
                         showNotification('Por favor completa todos los campos', 'error');
                         return;
@@ -2949,38 +2587,57 @@
                         showNotification('Introduce un monto válido', 'error');
                         return;
                     }
-                    expenses.unshift({
+
+                    const expenses = getActiveExpenses();
+                    expenses.push({
                         id: nextId++,
-                        category: CATEGORY,
-                        description,
-                        amount,
-                        date
+                        category: category,
+                        type: type,
+                        description: description,
+                        amount: amount,
+                        date: date
                     });
+                    getActiveAccountData().expenses = expenses;
                     saveToLocal();
-                    renderHistorico();
                     renderReport();
+                    renderHistorico();
                     descInput.value = '';
                     amountInput.value = '';
-                    showNotification('Gasto añadido correctamente', 'success');
+                    // Restaurar fecha a hoy
+                    const today = getToday();
+                    dateInput.value = today;
+                    pickerSelectedDate = getTodayDate();
+                    pickerCurrentMonth = pickerSelectedDate.getMonth();
+                    pickerCurrentYear = pickerSelectedDate.getFullYear();
+                    renderPicker();
+                    showNotification('Transacción añadida', 'success');
                 });
             }
 
+            // Filtros de semana
             if (weekPrev) {
                 weekPrev.addEventListener('click', function () {
-                    currentFriday = addWeeksToFriday(currentFriday, -1);
+                    const friday = getActiveFriday();
+                    const newFriday = addWeeksToFriday(friday, -1);
+                    setActiveFriday(newFriday);
                     renderReport();
                 });
             }
             if (weekNext) {
                 weekNext.addEventListener('click', function () {
-                    currentFriday = addWeeksToFriday(currentFriday, 1);
+                    const friday = getActiveFriday();
+                    const newFriday = addWeeksToFriday(friday, 1);
+                    setActiveFriday(newFriday);
                     renderReport();
                 });
             }
             if (weekToday) {
                 weekToday.addEventListener('click', function () {
-                    currentFriday = getPreviousFriday(getTodayDate());
+                    const today = getTodayDate();
+                    const friday = getPreviousFriday(today);
+                    setActiveFriday(friday);
                     renderReport();
+                    showNotification('Filtro restablecido a hoy', 'info');
                 });
             }
             if (applyFilterBtn) {
@@ -2991,12 +2648,15 @@
             }
             if (clearFilterBtn) {
                 clearFilterBtn.addEventListener('click', function () {
-                    currentFriday = getPreviousFriday(getTodayDate());
+                    const today = getTodayDate();
+                    const friday = getPreviousFriday(today);
+                    setActiveFriday(friday);
                     renderReport();
                     showNotification('Filtro restablecido a hoy', 'info');
                 });
             }
 
+            // Presupuesto
             if (budgetTotalInput) {
                 budgetTotalInput.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter' && saveBudgetsBtn) saveBudgetsBtn.click();
@@ -3009,32 +2669,17 @@
                         showNotification('Monto de presupuesto no válido', 'error');
                         return;
                     }
-                    budgetTotal = value;
-                    saveToLocal();
+                    setActiveBudget(value);
                     renderReport();
                     showNotification('Presupuesto guardado', 'success');
                 });
             }
             if (resetBudgetsBtn) {
                 resetBudgetsBtn.addEventListener('click', function () {
-                    budgetTotal = 0;
+                    setActiveBudget(0);
                     budgetTotalInput.value = '';
-                    saveToLocal();
                     renderReport();
                     showNotification('Presupuesto restablecido a 0', 'info');
-                });
-            }
-
-            // Reiniciar ciclo
-            if (resetCycleBtn) {
-                resetCycleBtn.addEventListener('click', function () {
-                    budgetTotal = 0;
-                    budgetTotalInput.value = '';
-                    currentFriday = getPreviousFriday(getTodayDate());
-                    saveToLocal();
-                    renderReport();
-                    renderHistorico();
-                    showNotification('Ciclo reiniciado correctamente', 'success');
                 });
             }
 
@@ -3083,7 +2728,8 @@
                 }
             });
 
-            // ---- Inicialización ----
+            // ===== INICIALIZACIÓN =====
+            // Poner fecha por defecto en el input
             const todayStr = getToday();
             dateInput.value = todayStr;
             const todayDate = getTodayDate();
@@ -3092,12 +2738,13 @@
             pickerCurrentYear = todayDate.getFullYear();
             renderPicker();
 
-            currentFriday = getPreviousFriday(getTodayDate());
+            // Cargar datos al inicio (pero no mostrar app hasta seleccionar cuenta)
             loadData();
-            budgetTotalInput.value = budgetTotal > 0 ? budgetTotal : '';
+            // Si ya hay una cuenta activa (por ejemplo, si se recarga), mostramos el selector igualmente
+            // pero podemos mostrar la app directamente si el usuario ya eligió antes.
+            // Por simplicidad, siempre mostramos el selector después del landing.
+            // El landing ya tiene el event listener para mostrar el selector.
 
-            renderHistorico();
-            renderReport();
         })();
     </script>
 </body>
