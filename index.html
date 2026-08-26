@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gastos · Registro y Reporte semanal</title>
+    <title>Gastos · Alimentación</title>
     <style>
         /* ---------- Reset & Fuente ---------- */
         * {
@@ -243,8 +243,7 @@
             display: none;
         }
 
-        .form-group input,
-        .custom-select .select-trigger {
+        .form-group input {
             width: 100%;
             background: #1c1c1e;
             border: 1px solid #3a3a3c;
@@ -259,8 +258,7 @@
             line-height: 1.2;
         }
 
-        .form-group input:focus,
-        .custom-select .select-trigger:focus {
+        .form-group input:focus {
             border-color: #0a84ff;
             box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
         }
@@ -281,6 +279,20 @@
         .form-group input[type="date"] {
             color-scheme: dark;
             padding: 11px 14px;
+        }
+
+        .category-static {
+            display: flex;
+            align-items: center;
+            background: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            border-radius: 10px;
+            padding: 0 14px;
+            height: 48px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #e5e5ea;
+            width: 100%;
         }
 
         /* ---------- Botón Agregar ---------- */
@@ -313,115 +325,6 @@
         .btn-add:active {
             transform: scale(0.95);
             box-shadow: 0 0 8px rgba(10, 132, 255, 0.2);
-        }
-
-        /* ---------- Custom Dropdown (oscuro) ---------- */
-        .custom-select {
-            position: relative;
-            user-select: none;
-            cursor: pointer;
-            height: 48px;
-        }
-
-        .custom-select .select-trigger {
-            background: #1c1c1e;
-            border: 1px solid #3a3a3c;
-            border-radius: 10px;
-            padding: 12px 14px;
-            font-size: 16px;
-            font-family: inherit;
-            color: #e5e5ea;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.2s;
-            width: 100%;
-            cursor: pointer;
-            outline: none;
-            height: 48px;
-            box-sizing: border-box;
-        }
-
-        .custom-select .select-trigger:hover {
-            border-color: #636366;
-        }
-
-        .custom-select .select-trigger .chevron {
-            width: 18px;
-            height: 18px;
-            fill: none;
-            stroke: #8e8e93;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-left: 8px;
-            flex-shrink: 0;
-        }
-
-        .custom-select.open .select-trigger .chevron {
-            transform: rotate(180deg);
-        }
-
-        .custom-select .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: #2c2c2e;
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            padding: 6px 0;
-            opacity: 0;
-            visibility: hidden;
-            transform: scale(0.96) translateY(-6px);
-            transform-origin: top center;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 50;
-            max-height: 220px;
-            overflow-y: auto;
-            border: 0.5px solid #3a3a3c;
-        }
-
-        .custom-select.open .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: scale(1) translateY(0);
-        }
-
-        .dropdown-menu li {
-            list-style: none;
-            padding: 12px 18px;
-            font-size: 16px;
-            color: #e5e5ea;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: background 0.1s;
-            border-radius: 0;
-        }
-
-        .dropdown-menu li:first-child {
-            border-radius: 14px 14px 0 0;
-        }
-        .dropdown-menu li:last-child {
-            border-radius: 0 0 14px 14px;
-        }
-
-        .dropdown-menu li:hover {
-            background: #3a3a3c;
-        }
-
-        .dropdown-menu li .check {
-            color: #0a84ff;
-            font-weight: 600;
-            opacity: 0;
-            transition: 0.15s;
-        }
-
-        .dropdown-menu li.active .check {
-            opacity: 1;
         }
 
         /* ---------- Lista de gastos ---------- */
@@ -601,28 +504,8 @@
             color: #8e8e93;
         }
 
-        .filter-group .custom-select,
         .filter-group .week-selector {
             width: 100%;
-        }
-
-        .filter-group input {
-            width: 100%;
-            background: #1c1c1e;
-            border: 1px solid #3a3a3c;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 15px;
-            font-family: inherit;
-            color: #e5e5ea;
-            outline: none;
-            transition: 0.2s;
-            height: 44px;
-        }
-
-        .filter-group input:focus {
-            border-color: #0a84ff;
-            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
         }
 
         .filter-actions {
@@ -724,7 +607,7 @@
             background: #0070e0;
         }
 
-        /* ---------- Configuración: presupuestos ---------- */
+        /* ---------- Configuración: presupuesto mensual ---------- */
         .budget-item {
             display: flex;
             align-items: center;
@@ -1087,8 +970,6 @@
                 min-width: 80px;
             }
         }
-
-        /* Estilo para el botón "Entrar" en la landing (ya definido arriba) */
     </style>
 </head>
 <body>
@@ -1096,7 +977,7 @@
     <!-- LANDING PAGE -->
     <div id="landing">
         <h1>Gastos</h1>
-        <p>Registra tus gastos y consulta el reporte semanal de forma sencilla.</p>
+        <p>Controla tus gastos de alimentación con presupuesto mensual dividido en 5 semanas.</p>
         <button class="btn-entrar" id="entrarBtn">Entrar</button>
     </div>
 
@@ -1118,8 +999,8 @@
     <div class="app" id="appContainer">
         <!-- Header -->
         <div class="app-header">
-            <h1>Gastos</h1>
-            <p>Registra tus gastos y consulta el reporte semanal (viernes a jueves).</p>
+            <h1>Gastos · Alimentación</h1>
+            <p>Registra tus gastos. El presupuesto mensual se divide en 5 semanas fijas (viernes a jueves).</p>
         </div>
 
         <!-- Tabs -->
@@ -1142,17 +1023,9 @@
                 <form id="expenseForm" autocomplete="off">
                     <div class="form-row">
                         <div class="form-group label-hidden">
-                            <label for="categorySelect">Categoría</label>
-                            <div class="custom-select" id="categoryDropdown">
-                                <button type="button" class="select-trigger" id="dropdownTrigger">
-                                    <span id="selectedCategoryText">Alimentación</span>
-                                    <svg class="chevron" viewBox="0 0 24 24">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </button>
-                                <ul class="dropdown-menu" id="dropdownMenu"></ul>
-                                <input type="hidden" id="categoryInput" value="Alimentación" />
-                            </div>
+                            <label for="categoryStatic">Categoría</label>
+                            <div class="category-static">🍽️ Alimentación</div>
+                            <input type="hidden" id="categoryInput" value="Alimentación" />
                         </div>
 
                         <div class="form-group label-hidden">
@@ -1184,11 +1057,15 @@
 
         <!-- Panel 2: Reporte semanal -->
         <div class="tab-panel" id="tab2" role="tabpanel">
-            <!-- Tarjeta de resumen con dos líneas -->
+            <!-- Tarjeta de resumen con tres líneas -->
             <div class="summary-card" id="reportSummary">
                 <div class="row">
                     <span class="label">Total semana</span>
                     <span class="value" id="reportTotal">0,00 €</span>
+                </div>
+                <div class="row">
+                    <span class="label">Presupuesto base semanal</span>
+                    <span class="value" id="reportBase" style="color:#8e8e93;font-size:18px;">0,00 €</span>
                 </div>
                 <div class="row">
                     <span class="label">Resto disponible</span>
@@ -1200,21 +1077,7 @@
             <div class="filter-section">
                 <div class="filter-title">Filtros</div>
                 <div class="filter-grid">
-                    <div class="filter-group">
-                        <label>Categoría</label>
-                        <div class="custom-select" id="reportCategoryDropdown">
-                            <button type="button" class="select-trigger" id="reportDropdownTrigger">
-                                <span id="reportSelectedCategoryText">Todas</span>
-                                <svg class="chevron" viewBox="0 0 24 24">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            <ul class="dropdown-menu" id="reportDropdownMenu"></ul>
-                            <input type="hidden" id="reportCategoryInput" value="todas" />
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
+                    <div class="filter-group" style="grid-column: 1 / -1;">
                         <label>Semana</label>
                         <div class="week-selector">
                             <button class="week-nav-btn" id="weekPrev">‹</button>
@@ -1223,7 +1086,6 @@
                             <button class="week-today-btn" id="weekToday">Hoy</button>
                         </div>
                     </div>
-
                     <div class="filter-actions">
                         <button class="btn-filter" id="applyFilterBtn">Aplicar filtro</button>
                         <button class="btn-filter" id="clearFilterBtn" style="background:#1c1c1e;">Limpiar</button>
@@ -1238,16 +1100,21 @@
             <div class="expense-list" id="reportList"></div>
         </div>
 
-        <!-- Panel 3: Configuración (presupuestos) -->
+        <!-- Panel 3: Configuración (presupuesto mensual) -->
         <div class="tab-panel" id="tab3" role="tabpanel">
-            <h2 style="font-size:20px; font-weight:600; margin-bottom:16px; letter-spacing:-0.3px; color:#ffffff;">Presupuestos mensuales por categoría</h2>
-            <p style="color:#8e8e93; margin-bottom:20px; font-size:15px;">Define un límite de gasto para cada categoría. Te ayudará a controlar tus finanzas.</p>
+            <h2 style="font-size:20px; font-weight:600; margin-bottom:16px; letter-spacing:-0.3px; color:#ffffff;">Presupuesto mensual</h2>
+            <p style="color:#8e8e93; margin-bottom:20px; font-size:15px;">Define el presupuesto total mensual. Se dividirá en 5 semanas fijas.</p>
 
-            <div id="budgetList"></div>
+            <div class="budget-item">
+                <span class="budget-category">🍽️ Alimentación</span>
+                <div class="budget-input">
+                    <input type="number" id="budgetTotalInput" step="0.01" min="0" placeholder="0,00" />
+                </div>
+            </div>
 
             <div class="budget-actions">
-                <button class="btn-save-budgets" id="saveBudgetsBtn">Guardar presupuestos</button>
-                <button class="btn-reset-budgets" id="resetBudgetsBtn">Restablecer</button>
+                <button class="btn-save-budgets" id="saveBudgetsBtn">Guardar presupuesto</button>
+                <button class="btn-reset-budgets" id="resetBudgetsBtn">Restablecer a 0</button>
             </div>
         </div>
     </div>
@@ -1319,22 +1186,12 @@
             });
 
             // ---------- CONSTANTES ----------
-            const CATEGORIES = [
-                'Alimentación',
-                'Transporte',
-                'Vivienda',
-                'Ocio',
-                'Salud',
-                'Educación',
-                'Servicios',
-                'Otros'
-            ];
+            const CATEGORY = 'Alimentación';
+            const WEEKS_PER_MONTH = 5; // SIEMPRE 5 SEMANAS
 
             let expenses = [];
             let nextId = 1;
-            let selectedCategory = 'Alimentación';
-            let reportSelectedCategory = 'todas';
-            let budgets = {};
+            let budgetTotal = 0; // presupuesto mensual total
 
             // Variables para la semana personalizada (viernes a jueves)
             let currentFriday = null; // Date que representa el viernes de inicio de la semana
@@ -1350,6 +1207,7 @@
 
             const reportListEl = document.getElementById('reportList');
             const reportTotalEl = document.getElementById('reportTotal');
+            const reportBaseEl = document.getElementById('reportBase');
             const reportRemainingEl = document.getElementById('reportRemaining');
             const reportCountEl = document.getElementById('reportCount');
 
@@ -1361,22 +1219,8 @@
             const weekNext = document.getElementById('weekNext');
             const weekToday = document.getElementById('weekToday');
 
-            // Dropdown de categoría en registro
-            const dropdownContainer = document.getElementById('categoryDropdown');
-            const dropdownTrigger = document.getElementById('dropdownTrigger');
-            const dropdownMenu = document.getElementById('dropdownMenu');
-            const selectedCategoryText = document.getElementById('selectedCategoryText');
-            const categoryInputHidden = document.getElementById('categoryInput');
-
-            // Dropdown de categoría en reporte
-            const reportDropdownContainer = document.getElementById('reportCategoryDropdown');
-            const reportDropdownTrigger = document.getElementById('reportDropdownTrigger');
-            const reportDropdownMenu = document.getElementById('reportDropdownMenu');
-            const reportSelectedCategoryText = document.getElementById('reportSelectedCategoryText');
-            const reportCategoryInput = document.getElementById('reportCategoryInput');
-
             // Configuración
-            const budgetListEl = document.getElementById('budgetList');
+            const budgetTotalInput = document.getElementById('budgetTotalInput');
             const saveBudgetsBtn = document.getElementById('saveBudgetsBtn');
             const resetBudgetsBtn = document.getElementById('resetBudgetsBtn');
 
@@ -1390,15 +1234,14 @@
             }
 
             function formatDate(date) {
-                const d = date;
-                return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+                return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
             }
 
             // Obtiene el viernes más cercano anterior (o el mismo día si es viernes)
             function getPreviousFriday(date) {
                 const d = new Date(date);
                 const day = d.getDay(); // 0=domingo, 5=viernes
-                const diff = (day >= 5) ? (day - 5) : (day + 2); // días a restar
+                const diff = (day >= 5) ? (day - 5) : (day + 2);
                 d.setDate(d.getDate() - diff);
                 return d;
             }
@@ -1420,7 +1263,6 @@
 
             // ---------- Cargar datos ----------
             function loadData() {
-                // Gastos
                 const stored = localStorage.getItem('expenses_data');
                 if (stored) {
                     try {
@@ -1433,21 +1275,11 @@
                     } catch (_) {}
                 }
 
-                // Presupuestos
-                const storedBudgets = localStorage.getItem('budgets_data');
-                if (storedBudgets) {
-                    try {
-                        const parsed = JSON.parse(storedBudgets);
-                        if (typeof parsed === 'object') {
-                            budgets = parsed;
-                        }
-                    } catch (_) {}
+                const storedBudget = localStorage.getItem('budget_total');
+                if (storedBudget !== null) {
+                    const val = parseFloat(storedBudget);
+                    if (!isNaN(val) && val >= 0) budgetTotal = val;
                 }
-                CATEGORIES.forEach(cat => {
-                    if (!(cat in budgets)) {
-                        budgets[cat] = 0;
-                    }
-                });
 
                 saveToLocal();
             }
@@ -1460,110 +1292,52 @@
 
             function saveToLocal() {
                 localStorage.setItem('expenses_data', JSON.stringify(expenses));
-                localStorage.setItem('budgets_data', JSON.stringify(budgets));
+                localStorage.setItem('budget_total', String(budgetTotal));
             }
 
-            // ---------- Dropdown de registro ----------
-            function renderDropdown() {
-                dropdownMenu.innerHTML = '';
-                CATEGORIES.forEach(cat => {
-                    const li = document.createElement('li');
-                    li.dataset.value = cat;
-                    li.innerHTML = `${cat} <span class="check">✓</span>`;
-                    if (cat === selectedCategory) li.classList.add('active');
-                    li.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        selectCategory(cat);
-                        closeDropdown();
-                    });
-                    dropdownMenu.appendChild(li);
+            // ---------- Obtener índice de la semana basado en gastos ----------
+            function getWeekIndexFromExpenses(friday) {
+                if (!friday) return 0;
+                const range = getWeekRange(friday);
+                const start = range.start;
+                const end = range.end;
+
+                // Obtener todos los gastos del mismo mes que la semana
+                const year = friday.getFullYear();
+                const month = friday.getMonth();
+                const monthExpenses = expenses.filter(e => {
+                    const d = new Date(e.date + 'T00:00:00');
+                    return d.getFullYear() === year && d.getMonth() === month;
                 });
-            }
 
-            function selectCategory(cat) {
-                selectedCategory = cat;
-                selectedCategoryText.textContent = cat;
-                categoryInputHidden.value = cat;
-                document.querySelectorAll('#dropdownMenu li').forEach(li => {
-                    li.classList.toggle('active', li.dataset.value === cat);
+                if (monthExpenses.length === 0) return 0;
+
+                // Agrupar gastos por semana (viernes a jueves)
+                const weeksMap = new Map();
+                monthExpenses.forEach(e => {
+                    const d = new Date(e.date + 'T00:00:00');
+                    const f = getPreviousFriday(d);
+                    const key = f.getTime();
+                    if (!weeksMap.has(key)) {
+                        weeksMap.set(key, { friday: f, expenses: [] });
+                    }
+                    weeksMap.get(key).expenses.push(e);
                 });
+
+                // Ordenar semanas por fecha
+                const sortedWeeks = Array.from(weeksMap.keys()).sort((a, b) => a - b);
+                const currentKey = friday.getTime();
+
+                // Buscar el índice de la semana actual en la lista ordenada
+                const index = sortedWeeks.indexOf(currentKey);
+                if (index === -1) {
+                    // Si la semana actual no tiene gastos, pero hay gastos en otras semanas,
+                    // la semana actual es la siguiente a la última semana con gastos
+                    // O simplemente retornamos el número de semanas con gastos (para que se acumule)
+                    return sortedWeeks.length;
+                }
+                return index;
             }
-
-            function toggleDropdown() {
-                dropdownContainer.classList.toggle('open');
-            }
-
-            function closeDropdown() {
-                dropdownContainer.classList.remove('open');
-            }
-
-            dropdownTrigger.addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleDropdown();
-            });
-            document.addEventListener('click', function(e) {
-                if (!dropdownContainer.contains(e.target)) closeDropdown();
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeDropdown();
-            });
-
-            // ---------- Dropdown de reporte (categoría) ----------
-            function renderReportDropdown() {
-                reportDropdownMenu.innerHTML = '';
-                const allLi = document.createElement('li');
-                allLi.dataset.value = 'todas';
-                allLi.innerHTML = `Todas <span class="check">✓</span>`;
-                if (reportSelectedCategory === 'todas') allLi.classList.add('active');
-                allLi.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    selectReportCategory('todas');
-                    closeReportDropdown();
-                });
-                reportDropdownMenu.appendChild(allLi);
-
-                CATEGORIES.forEach(cat => {
-                    const li = document.createElement('li');
-                    li.dataset.value = cat;
-                    li.innerHTML = `${cat} <span class="check">✓</span>`;
-                    if (cat === reportSelectedCategory) li.classList.add('active');
-                    li.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        selectReportCategory(cat);
-                        closeReportDropdown();
-                    });
-                    reportDropdownMenu.appendChild(li);
-                });
-            }
-
-            function selectReportCategory(cat) {
-                reportSelectedCategory = cat;
-                reportSelectedCategoryText.textContent = cat === 'todas' ? 'Todas' : cat;
-                reportCategoryInput.value = cat;
-                document.querySelectorAll('#reportDropdownMenu li').forEach(li => {
-                    li.classList.toggle('active', li.dataset.value === cat);
-                });
-                renderReport();
-            }
-
-            function toggleReportDropdown() {
-                reportDropdownContainer.classList.toggle('open');
-            }
-
-            function closeReportDropdown() {
-                reportDropdownContainer.classList.remove('open');
-            }
-
-            reportDropdownTrigger.addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleReportDropdown();
-            });
-            document.addEventListener('click', function(e) {
-                if (!reportDropdownContainer.contains(e.target)) closeReportDropdown();
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeReportDropdown();
-            });
 
             // ---------- Renderizar lista de registro ----------
             function renderExpenses() {
@@ -1626,7 +1400,7 @@
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                const category = selectedCategory;
+                const category = CATEGORY;
                 const description = descInput.value.trim();
                 const amount = parseFloat(amountInput.value);
                 const date = dateInput.value;
@@ -1645,12 +1419,6 @@
                     showNotification('Selecciona una fecha.', 'error');
                     dateInput.focus();
                     return;
-                }
-
-                const budget = budgets[category] || 0;
-                const totalCategory = expenses.filter(e => e.category === category).reduce((s, e) => s + e.amount, 0);
-                if (budget > 0 && (totalCategory + amount) > budget) {
-                    showNotification(`⚠️ Superas el presupuesto de ${category} (${budget.toFixed(2)} €)`, 'error', 4000);
                 }
 
                 expenses.push({
@@ -1673,13 +1441,7 @@
 
             // ---------- Funciones de reporte ----------
             function filterExpenses() {
-                const cat = reportSelectedCategory;
                 let filtered = [...expenses];
-
-                if (cat !== 'todas') {
-                    filtered = filtered.filter(e => e.category === cat);
-                }
-
                 if (currentFriday) {
                     const range = getWeekRange(currentFriday);
                     const start = new Date(range.start);
@@ -1691,38 +1453,101 @@
                         return expDate >= start && expDate <= end;
                     });
                 }
-
                 return filtered;
             }
 
             function renderReport() {
                 const filtered = filterExpenses();
-
-                // Actualizar total semana
                 const totalSemana = filtered.reduce((sum, e) => sum + e.amount, 0);
+
+                // Mostrar total semana
                 reportTotalEl.textContent = totalSemana.toFixed(2).replace('.', ',') + ' €';
 
-                // Calcular presupuesto total mensual (suma de todas las categorías)
-                let totalBudget = 0;
-                for (let cat in budgets) {
-                    totalBudget += budgets[cat];
+                // Calcular el "Resto disponible" con base fija en 5 semanas
+                let remaining = 0;
+                let remainingClass = 'positive';
+                let baseWeekly = 0;
+
+                if (budgetTotal > 0 && currentFriday) {
+                    baseWeekly = budgetTotal / WEEKS_PER_MONTH; // siempre dividir entre 5
+
+                    // Obtener el índice de la semana basado en los gastos
+                    const weekIndex = getWeekIndexFromExpenses(currentFriday);
+
+                    // Calcular gastos de semanas anteriores (desde el primer viernes del mes hasta la semana anterior)
+                    let prevExpenses = 0;
+                    const year = currentFriday.getFullYear();
+                    const month = currentFriday.getMonth();
+                    const monthExpenses = expenses.filter(e => {
+                        const d = new Date(e.date + 'T00:00:00');
+                        return d.getFullYear() === year && d.getMonth() === month;
+                    });
+
+                    // Agrupar gastos por semana para calcular los de semanas anteriores
+                    const weeksMap = new Map();
+                    monthExpenses.forEach(e => {
+                        const d = new Date(e.date + 'T00:00:00');
+                        const f = getPreviousFriday(d);
+                        const key = f.getTime();
+                        if (!weeksMap.has(key)) {
+                            weeksMap.set(key, { friday: f, expenses: [] });
+                        }
+                        weeksMap.get(key).expenses.push(e);
+                    });
+
+                    const sortedKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b);
+                    const currentKey = currentFriday.getTime();
+                    const currentIndex = sortedKeys.indexOf(currentKey);
+
+                    // Sumar gastos de semanas anteriores (índices menores al actual)
+                    if (currentIndex !== -1) {
+                        for (let i = 0; i < currentIndex; i++) {
+                            const weekExpenses = weeksMap.get(sortedKeys[i]).expenses;
+                            const total = weekExpenses.reduce((s, e) => s + e.amount, 0);
+                            prevExpenses += total;
+                        }
+                    } else {
+                        // Si la semana actual no tiene gastos, pero hay gastos en semanas anteriores,
+                        // sumar todos los gastos anteriores
+                        for (let i = 0; i < sortedKeys.length; i++) {
+                            if (sortedKeys[i] < currentKey) {
+                                const weekExpenses = weeksMap.get(sortedKeys[i]).expenses;
+                                const total = weekExpenses.reduce((s, e) => s + e.amount, 0);
+                                prevExpenses += total;
+                            }
+                        }
+                    }
+
+                    // Presupuesto asignado hasta la semana actual (inclusive) = base * (weekIndex + 1)
+                    const assignedSoFar = baseWeekly * (weekIndex + 1);
+                    // Gastos totales hasta la semana actual
+                    const totalSpentSoFar = prevExpenses + totalSemana;
+                    remaining = assignedSoFar - totalSpentSoFar;
+                    remainingClass = remaining >= 0 ? 'positive' : '';
+                } else if (budgetTotal === 0) {
+                    remaining = 0;
+                    remainingClass = 'neutral';
                 }
-                const weeksInMonth = 5;
-                const weeklyBudget = totalBudget / weeksInMonth;
-                const remaining = weeklyBudget - totalSemana;
+
+                // Mostrar presupuesto base semanal
+                if (budgetTotal > 0) {
+                    reportBaseEl.textContent = baseWeekly.toFixed(2).replace('.', ',') + ' €';
+                } else {
+                    reportBaseEl.textContent = '—';
+                }
 
                 // Mostrar resto disponible
-                if (totalBudget === 0) {
+                if (budgetTotal === 0) {
                     reportRemainingEl.textContent = 'Sin presupuesto';
                     reportRemainingEl.className = 'value neutral';
                 } else {
                     reportRemainingEl.textContent = remaining.toFixed(2).replace('.', ',') + ' €';
-                    reportRemainingEl.className = 'value ' + (remaining >= 0 ? 'positive' : '');
+                    reportRemainingEl.className = 'value ' + remainingClass;
                 }
 
                 // Mostrar lista de resultados
                 if (filtered.length === 0) {
-                    reportListEl.innerHTML = `<div class="empty-state">No hay gastos que coincidan con los filtros.</div>`;
+                    reportListEl.innerHTML = `<div class="empty-state">No hay gastos en esta semana.</div>`;
                     reportCountEl.textContent = '0';
                     return;
                 }
@@ -1801,59 +1626,41 @@
             });
 
             clearFilterBtn.addEventListener('click', function() {
-                selectReportCategory('todas');
                 goToTodayWeek();
             });
 
-            // Eventos de navegación semanal
             weekPrev.addEventListener('click', goToPreviousWeek);
             weekNext.addEventListener('click', goToNextWeek);
             weekToday.addEventListener('click', goToTodayWeek);
 
-            // ---------- Configuración: Presupuestos ----------
-            function renderBudgets() {
-                let html = '';
-                CATEGORIES.forEach(cat => {
-                    const val = budgets[cat] || 0;
-                    html += `
-                        <div class="budget-item" data-category="${cat}">
-                            <span class="budget-category">${cat}</span>
-                            <div class="budget-input">
-                                <input type="number" class="budget-input-field" value="${val}" step="0.01" min="0" placeholder="0,00" />
-                            </div>
-                        </div>
-                    `;
-                });
-                budgetListEl.innerHTML = html;
+            // ---------- Configuración: Presupuesto mensual ----------
+            function renderBudget() {
+                budgetTotalInput.value = budgetTotal > 0 ? budgetTotal.toFixed(2) : '';
             }
 
-            function saveBudgets() {
-                const inputs = document.querySelectorAll('.budget-input-field');
-                inputs.forEach((input, index) => {
-                    const cat = CATEGORIES[index];
-                    const val = parseFloat(input.value);
-                    if (!isNaN(val) && val >= 0) {
-                        budgets[cat] = val;
-                    } else {
-                        budgets[cat] = 0;
-                    }
-                });
-                saveToLocal();
-                showNotification('Presupuestos guardados correctamente.', 'success');
-                renderBudgets();
-                renderReport(); // actualizar el resto disponible
+            function saveBudget() {
+                const val = parseFloat(budgetTotalInput.value);
+                if (!isNaN(val) && val >= 0) {
+                    budgetTotal = val;
+                    saveToLocal();
+                    renderBudget();
+                    renderReport();
+                    showNotification('Presupuesto guardado correctamente.', 'success');
+                } else {
+                    showNotification('Introduce un valor numérico válido.', 'error');
+                }
             }
 
-            function resetBudgets() {
-                CATEGORIES.forEach(cat => { budgets[cat] = 0; });
+            function resetBudget() {
+                budgetTotal = 0;
                 saveToLocal();
-                renderBudgets();
+                renderBudget();
                 renderReport();
-                showNotification('Presupuestos restablecidos a cero.', 'info');
+                showNotification('Presupuesto restablecido a 0.', 'info');
             }
 
-            saveBudgetsBtn.addEventListener('click', saveBudgets);
-            resetBudgetsBtn.addEventListener('click', resetBudgets);
+            saveBudgetsBtn.addEventListener('click', saveBudget);
+            resetBudgetsBtn.addEventListener('click', resetBudget);
 
             // ---------- Tabs ----------
             function switchTab(tabId) {
@@ -1863,7 +1670,7 @@
                     renderReport();
                 }
                 if (tabId === 'tab3') {
-                    renderBudgets();
+                    renderBudget();
                 }
             }
 
@@ -1876,18 +1683,13 @@
             // ---------- Inicializar ----------
             function init() {
                 loadData();
-                renderDropdown();
-                renderReportDropdown();
                 dateInput.value = getToday();
-                selectCategory(CATEGORIES[0]);
-                selectReportCategory('todas');
-                // Inicializar semana actual (viernes anterior)
                 const today = getTodayDate();
                 const friday = getPreviousFriday(today);
                 setWeek(friday);
                 renderExpenses();
                 renderReport();
-                renderBudgets();
+                renderBudget();
                 switchTab('tab1');
             }
 
