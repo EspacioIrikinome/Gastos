@@ -1591,7 +1591,7 @@
             <img src="Gastos.png" alt="Gastos" class="app-logo" style="width: 110px; height: auto;">
         </div>
 
-        <h1>FinPlanner</h1>
+        <h1>Gastos</h1>
 
         <p>
             Controla tus finanzas personales con múltiples cuentas.
@@ -1601,12 +1601,9 @@
         <button class="btn-entrar" id="entrarBtn">Empezar</button>
     </div>
 
-    <!-- SELECTOR DE CUENTAS -->
+    <!-- SELECTOR DE CUENTAS (sin iconos) -->
     <div id="accountSelector">
-  <div class="landing-logo">
-            <img src="Gastos.png" alt="Gastos" class="app-logo" style="width: 110px; height: auto;">
-        </div>
-        <h2>Selecciona tu cuenta</h2>
+        <h2>📊 Selecciona tu cuenta</h2>
         <p class="sub">Elige la cuenta que quieres gestionar</p>
 
         <div class="account-grid" id="accountGrid">
@@ -1644,12 +1641,12 @@
 
                 <div>
                     <h1 id="appTitle">Gastos</h1>
-                    <p id="appSubtitle">Alimentación · Control semanal</p>
+                    <p id="appSubtitle">Control semanal</p>
                 </div>
             </div>
 
             <button class="account-selector-btn" id="changeAccountBtn">
-                 Cambiar cuenta
+                Cambiar cuenta
             </button>
         </header>
 
@@ -1778,7 +1775,8 @@
                     <span class="value" id="reportTotal">0,00 €</span>
                 </div>
 
-                <div class="row">
+                <!-- Estas filas solo se muestran para la cuenta "gastos" -->
+                <div class="row budget-rows" id="budgetRows" style="display:none;">
                     <span class="label">Presupuesto disponible</span>
                     <span
                         class="value"
@@ -1789,7 +1787,7 @@
                     </span>
                 </div>
 
-                <div class="row">
+                <div class="row budget-rows" id="remainingRows" style="display:none;">
                     <span class="label">Resto disponible</span>
                     <span class="value positive" id="reportRemaining">
                         0,00 €
@@ -1856,41 +1854,54 @@
 
             <div class="budget-card">
 
-                <h2 class="budget-title">Presupuesto mensual</h2>
+                <h2 class="budget-title" id="budgetTitle">Presupuesto mensual</h2>
 
-                <p class="budget-description">
-                    Define el presupuesto total. La app lo divide automáticamente
-                    en 5 semanas fijas. Los sobrantes y excesos se trasladan a la
-                    semana siguiente.
-                </p>
+                <!-- Sección de presupuesto (solo para "gastos") -->
+                <div id="budgetSection">
+                    <p class="budget-description" id="budgetDesc">
+                        Define el presupuesto total. La app lo divide automáticamente
+                        en 5 semanas fijas. Los sobrantes y excesos se trasladan a la
+                        semana siguiente.
+                    </p>
 
-                <div class="budget-item">
-                    <span class="budget-category" id="budgetCategoryLabel">
-                        Alimentación
-                    </span>
+                    <div class="budget-item">
+                        <span class="budget-category" id="budgetCategoryLabel">
+                            Alimentación
+                        </span>
 
-                    <div class="budget-input">
-                        <input
-                            type="number"
-                            id="budgetTotalInput"
-                            step="0.01"
-                            min="0"
-                            placeholder="0,00 €"
-                        >
+                        <div class="budget-input">
+                            <input
+                                type="number"
+                                id="budgetTotalInput"
+                                step="0.01"
+                                min="0"
+                                placeholder="0,00 €"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="budget-actions">
+                        <button class="btn-save-budgets" id="saveBudgetsBtn">
+                            Guardar presupuesto
+                        </button>
+
+                        <button class="btn-reset-budgets" id="resetBudgetsBtn">
+                            Restablecer a 0
+                        </button>
+
+                        <!-- Botón Reiniciar ciclo (solo para "gastos") -->
+                        <button class="btn-reset-budgets" id="resetCycleBtn" style="border-color: var(--warning); color: var(--warning); display: none;">
+                            Reiniciar ciclo
+                        </button>
                     </div>
                 </div>
 
-                <div class="budget-actions">
-
-                    <button class="btn-save-budgets" id="saveBudgetsBtn">
-                        Guardar presupuesto
-                    </button>
-
-                    <button class="btn-reset-budgets" id="resetBudgetsBtn">
-                        Restablecer a 0
-                    </button>
-
+                <!-- Mensaje para cuentas sin presupuesto -->
+                <div id="noBudgetMessage" style="display: none; color: var(--muted); text-align: center; padding: 20px 0;">
+                    <p style="font-size: 16px;">📌 Esta cuenta no tiene presupuesto semanal.</p>
+                    <p style="font-size: 13px; margin-top: 8px;">Funciona como una cuenta simple de ingresos y gastos.</p>
                 </div>
+
             </div>
         </div>
 
@@ -1918,20 +1929,20 @@
         (function () {
             'use strict';
 
-            // ===== CONFIGURACIÓN DE CUENTAS =====
+            // ===== CONFIGURACIÓN DE CUENTAS (sin iconos) =====
             const ACCOUNTS_CONFIG = [
-                { id: 'gastos', name: 'Alimentación', icon: '', emoji: '', defaultCategory: 'Alimentación' },
-                { id: 'viajes', name: 'Viajes', icon: '', emoji: '', defaultCategory: 'Viajes' },
-                { id: 'imprevistos', name: 'Imprevistos', icon: '', emoji: '', defaultCategory: 'Imprevistos' },
-                { id: 'personal', name: 'Personal', icon: '', emoji: '', defaultCategory: 'Personal' }
+                { id: 'gastos', name: 'Gastos', defaultCategory: 'Alimentación' },
+                { id: 'viajes', name: 'Viajes', defaultCategory: 'Viajes' },
+                { id: 'imprevistos', name: 'Imprevistos', defaultCategory: 'Imprevistos' },
+                { id: 'personal', name: 'Personal', defaultCategory: 'Personal' }
             ];
 
             const WEEKS_PER_MONTH = 5;
 
             // ===== ESTADO =====
-            let accountsData = {}; // { accountId: { expenses: [], budgetTotal: 0, currentFriday: null } }
+            let accountsData = {}; // { accountId: { expenses: [], budgetTotal: 0, currentFriday: null, resetDate: null } }
             let activeAccountId = 'gastos';
-            let nextId = 1; // global para todos los gastos (para mantener ids únicos)
+            let nextId = 1;
             let pendingDeleteId = null;
 
             // ===== ELEMENTOS DOM =====
@@ -1945,6 +1956,10 @@
             const appSubtitle = document.getElementById('appSubtitle');
             const categoryDisplay = document.getElementById('categoryDisplay');
             const budgetCategoryLabel = document.getElementById('budgetCategoryLabel');
+            const budgetTitle = document.getElementById('budgetTitle');
+            const budgetDesc = document.getElementById('budgetDesc');
+            const budgetSection = document.getElementById('budgetSection');
+            const noBudgetMessage = document.getElementById('noBudgetMessage');
 
             const notificationContainer = document.getElementById('notification-container');
             const modalOverlay = document.getElementById('confirmModal');
@@ -1965,6 +1980,8 @@
             const reportBaseEl = document.getElementById('reportBase');
             const reportRemainingEl = document.getElementById('reportRemaining');
             const reportCountEl = document.getElementById('reportCount');
+            const budgetRows = document.getElementById('budgetRows');
+            const remainingRows = document.getElementById('remainingRows');
 
             const applyFilterBtn = document.getElementById('applyFilterBtn');
             const clearFilterBtn = document.getElementById('clearFilterBtn');
@@ -1976,6 +1993,7 @@
             const budgetTotalInput = document.getElementById('budgetTotalInput');
             const saveBudgetsBtn = document.getElementById('saveBudgetsBtn');
             const resetBudgetsBtn = document.getElementById('resetBudgetsBtn');
+            const resetCycleBtn = document.getElementById('resetCycleBtn');
 
             const historicoListEl = document.getElementById('historicoList');
             const historicoTotalEl = document.getElementById('historicoTotal');
@@ -2087,18 +2105,18 @@
                         const parsed = JSON.parse(stored);
                         if (parsed.accounts) {
                             accountsData = parsed.accounts;
-                            // Asegurar que cada cuenta tenga los campos necesarios
                             ACCOUNTS_CONFIG.forEach(acc => {
                                 if (!accountsData[acc.id]) {
                                     accountsData[acc.id] = {
                                         expenses: [],
                                         budgetTotal: 0,
-                                        currentFriday: null
+                                        currentFriday: null,
+                                        resetDate: null
                                     };
                                 } else {
                                     if (!accountsData[acc.id].expenses) accountsData[acc.id].expenses = [];
                                     if (typeof accountsData[acc.id].budgetTotal !== 'number') accountsData[acc.id].budgetTotal = 0;
-                                    // currentFriday puede ser null
+                                    if (!accountsData[acc.id].resetDate) accountsData[acc.id].resetDate = null;
                                 }
                             });
                             if (typeof parsed.nextId === 'number') nextId = parsed.nextId;
@@ -2112,11 +2130,9 @@
                 } else {
                     initDefaultAccounts();
                 }
-                // Asegurar que la cuenta activa existe
                 if (!accountsData[activeAccountId]) {
                     activeAccountId = ACCOUNTS_CONFIG[0].id;
                 }
-                // Inicializar currentFriday para cada cuenta si es null
                 const today = getTodayDate();
                 ACCOUNTS_CONFIG.forEach(acc => {
                     const data = accountsData[acc.id];
@@ -2134,7 +2150,8 @@
                     accountsData[acc.id] = {
                         expenses: [],
                         budgetTotal: 0,
-                        currentFriday: getPreviousFriday(today).toISOString()
+                        currentFriday: getPreviousFriday(today).toISOString(),
+                        resetDate: null
                     };
                 });
                 nextId = 1;
@@ -2176,6 +2193,23 @@
                 saveToLocal();
             }
 
+            function getResetDate() {
+                return getActiveAccountData().resetDate ? new Date(getActiveAccountData().resetDate) : null;
+            }
+
+            function setResetDate(date) {
+                if (date) {
+                    getActiveAccountData().resetDate = date.toISOString();
+                } else {
+                    getActiveAccountData().resetDate = null;
+                }
+                saveToLocal();
+            }
+
+            function isBudgetAccount() {
+                return activeAccountId === 'gastos';
+            }
+
             // ===== FUNCIONES DE NEGOCIO =====
             function getWeekExpenses(friday, expenses) {
                 const range = getWeekRange(friday);
@@ -2186,16 +2220,33 @@
 
             function getWeeklyBudgetData(targetFriday, budgetTotal, expenses) {
                 const initialWeeklyBudget = budgetTotal / WEEKS_PER_MONTH;
-                let firstFriday = getPreviousFriday(targetFriday);
-                if (expenses.length > 0) {
-                    const expenseDates = expenses
-                        .map(item => parseLocalDate(item.date))
-                        .filter(date => !isNaN(date.getTime()));
-                    if (expenseDates.length > 0) {
-                        const firstExpenseTime = Math.min(...expenseDates.map(date => date.getTime()));
-                        firstFriday = getPreviousFriday(new Date(firstExpenseTime));
+
+                // Determinar el primer viernes a partir del cual calcular
+                let firstFriday;
+                const resetDate = getResetDate();
+                if (resetDate && isBudgetAccount()) {
+                    // Si hay fecha de reinicio, usarla como punto de partida
+                    firstFriday = getPreviousFriday(resetDate);
+                } else {
+                    // Buscar el primer gasto
+                    firstFriday = getPreviousFriday(targetFriday);
+                    if (expenses.length > 0) {
+                        const expenseDates = expenses
+                            .map(item => parseLocalDate(item.date))
+                            .filter(date => !isNaN(date.getTime()));
+                        if (expenseDates.length > 0) {
+                            const firstExpenseTime = Math.min(...expenseDates.map(date => date.getTime()));
+                            const firstExpenseDate = new Date(firstExpenseTime);
+                            // Si el primer gasto es posterior a la fecha de reinicio (si existe), usamos el reinicio
+                            if (resetDate && firstExpenseDate >= resetDate) {
+                                firstFriday = getPreviousFriday(resetDate);
+                            } else {
+                                firstFriday = getPreviousFriday(firstExpenseDate);
+                            }
+                        }
                     }
                 }
+
                 let accumulatedBalance = 0;
                 let currentWeek = new Date(firstFriday);
                 while (currentWeek <= targetFriday) {
@@ -2218,9 +2269,21 @@
                 const config = ACCOUNTS_CONFIG.find(a => a.id === activeAccountId);
                 if (config) {
                     appTitle.textContent = config.name;
-                    appSubtitle.textContent = config.icon + ' · Control semanal';
+                    appSubtitle.textContent = 'Control semanal';
                     categoryDisplay.textContent = config.defaultCategory || 'General';
-                    budgetCategoryLabel.textContent = config.icon + ' ' + config.name;
+                    budgetCategoryLabel.textContent = config.name;
+                }
+                // Mostrar/ocultar elementos de presupuesto según la cuenta
+                if (isBudgetAccount()) {
+                    budgetSection.style.display = 'block';
+                    noBudgetMessage.style.display = 'none';
+                    budgetTitle.textContent = 'Presupuesto mensual';
+                    budgetDesc.textContent = 'Define el presupuesto total. La app lo divide automáticamente en 5 semanas fijas. Los sobrantes y excesos se trasladan a la semana siguiente.';
+                    resetCycleBtn.style.display = 'block';
+                } else {
+                    budgetSection.style.display = 'none';
+                    noBudgetMessage.style.display = 'block';
+                    resetCycleBtn.style.display = 'none';
                 }
             }
 
@@ -2236,7 +2299,6 @@
                 const expenses = getActiveExpenses();
                 const budget = getActiveBudget();
 
-                // Calcular totales de ingresos y gastos de la semana
                 const weekExpenses = getWeekExpenses(friday, expenses);
                 let weekIncome = 0;
                 let weekOutcome = 0;
@@ -2246,7 +2308,6 @@
                 });
                 const weekTotal = weekIncome - weekOutcome;
 
-                // Totales históricos de la cuenta
                 let totalIncome = 0;
                 let totalExpense = 0;
                 expenses.forEach(item => {
@@ -2254,9 +2315,6 @@
                     else totalExpense += Number(item.amount);
                 });
                 const balance = totalIncome - totalExpense;
-
-                // Presupuesto semanal
-                const weeklyData = getWeeklyBudgetData(friday, budget, expenses);
 
                 reportIncomeEl.textContent = totalIncome.toFixed(2) + ' €';
                 reportExpensesEl.textContent = totalExpense.toFixed(2) + ' €';
@@ -2274,16 +2332,25 @@
                     reportTotalEl.className = 'value negative';
                 }
 
-                reportBaseEl.textContent = weeklyData.baseWeekly.toFixed(2) + ' €';
-                reportRemainingEl.textContent = weeklyData.remaining.toFixed(2) + ' €';
-                if (weeklyData.remaining < 0) {
-                    reportRemainingEl.className = 'value negative';
-                    reportRemainingEl.style.color = 'var(--danger)';
-                    reportRemainingEl.style.textShadow = '0 0 20px rgba(244, 63, 94, 0.4)';
+                // Mostrar/ocultar filas de presupuesto según cuenta
+                if (isBudgetAccount()) {
+                    budgetRows.style.display = 'flex';
+                    remainingRows.style.display = 'flex';
+                    const weeklyData = getWeeklyBudgetData(friday, budget, expenses);
+                    reportBaseEl.textContent = weeklyData.baseWeekly.toFixed(2) + ' €';
+                    reportRemainingEl.textContent = weeklyData.remaining.toFixed(2) + ' €';
+                    if (weeklyData.remaining < 0) {
+                        reportRemainingEl.className = 'value negative';
+                        reportRemainingEl.style.color = 'var(--danger)';
+                        reportRemainingEl.style.textShadow = '0 0 20px rgba(244, 63, 94, 0.4)';
+                    } else {
+                        reportRemainingEl.className = 'value positive';
+                        reportRemainingEl.style.color = '';
+                        reportRemainingEl.style.textShadow = '';
+                    }
                 } else {
-                    reportRemainingEl.className = 'value positive';
-                    reportRemainingEl.style.color = '';
-                    reportRemainingEl.style.textShadow = '';
+                    budgetRows.style.display = 'none';
+                    remainingRows.style.display = 'none';
                 }
 
                 // Lista de transacciones de la semana
@@ -2292,7 +2359,6 @@
                 if (weekExpenses.length === 0) {
                     reportListEl.innerHTML = '<div class="empty-state">No hay transacciones en esta semana.</div>';
                 } else {
-                    // Ordenar por fecha descendente
                     const sorted = [...weekExpenses].sort((a, b) => {
                         if (a.date < b.date) return 1;
                         if (a.date > b.date) return -1;
@@ -2361,29 +2427,25 @@
                 updateHeader();
                 renderReport();
                 renderHistorico();
-                // Actualizar campo de presupuesto
                 const budget = getActiveBudget();
                 budgetTotalInput.value = budget > 0 ? budget : '';
-                // Actualizar fecha del picker si está visible
             }
 
             // ===== SELECCIONAR CUENTA =====
             function selectAccount(accountId) {
                 activeAccountId = accountId;
-                // Ocultar selector, mostrar app
                 accountSelector.classList.remove('visible');
                 appContainer.style.display = 'block';
-                // Asegurar que la cuenta tenga datos
                 if (!accountsData[accountId]) {
                     accountsData[accountId] = {
                         expenses: [],
                         budgetTotal: 0,
-                        currentFriday: getPreviousFriday(getTodayDate()).toISOString()
+                        currentFriday: getPreviousFriday(getTodayDate()).toISOString(),
+                        resetDate: null
                     };
                     saveToLocal();
                 }
                 refreshAll();
-                // Cambiar a la primera pestaña
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 tabPanels.forEach(p => p.classList.remove('active'));
                 document.querySelector('[data-tab="tab1"]').classList.add('active');
@@ -2393,7 +2455,6 @@
 
             // ===== MOSTRAR SELECTOR DE CUENTAS =====
             function showAccountSelector() {
-                // Generar tarjetas
                 accountGrid.innerHTML = '';
                 const today = getTodayDate();
                 ACCOUNTS_CONFIG.forEach(acc => {
@@ -2407,7 +2468,6 @@
                     const card = document.createElement('div');
                     card.className = 'account-card';
                     card.innerHTML = `
-                        <span class="icon">${acc.icon}</span>
                         <div class="name">${acc.name}</div>
                         <span class="balance ${balance >= 0 ? 'positive' : 'negative'}">
                             ${balance.toFixed(2)} €
@@ -2518,7 +2578,6 @@
                 entrarBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     landing.classList.add('hidden');
-                    // Cargar datos y mostrar selector
                     loadData();
                     showAccountSelector();
                 });
@@ -2683,6 +2742,23 @@
                 });
             }
 
+            // ===== REINICIAR CICLO (solo para gastos) =====
+            if (resetCycleBtn) {
+                resetCycleBtn.addEventListener('click', function () {
+                    if (!isBudgetAccount()) return;
+                    const currentBudget = getActiveBudget();
+                    // Establecer fecha de reinicio a hoy
+                    const today = getTodayDate();
+                    setResetDate(today);
+                    // Establecer currentFriday al viernes de hoy
+                    const friday = getPreviousFriday(today);
+                    setActiveFriday(friday);
+                    // No se modifica el presupuesto (se mantiene)
+                    refreshAll();
+                    showNotification('Ciclo reiniciado. El presupuesto empieza desde cero esta semana.', 'success');
+                });
+            }
+
             // Selector de fecha
             if (dateInput) {
                 dateInput.addEventListener('click', function (e) {
@@ -2729,7 +2805,6 @@
             });
 
             // ===== INICIALIZACIÓN =====
-            // Poner fecha por defecto en el input
             const todayStr = getToday();
             dateInput.value = todayStr;
             const todayDate = getTodayDate();
@@ -2738,12 +2813,9 @@
             pickerCurrentYear = todayDate.getFullYear();
             renderPicker();
 
-            // Cargar datos al inicio (pero no mostrar app hasta seleccionar cuenta)
+            // Cargar datos (el landing mostrará el selector al hacer clic)
             loadData();
-            // Si ya hay una cuenta activa (por ejemplo, si se recarga), mostramos el selector igualmente
-            // pero podemos mostrar la app directamente si el usuario ya eligió antes.
-            // Por simplicidad, siempre mostramos el selector después del landing.
-            // El landing ya tiene el event listener para mostrar el selector.
+            // Si ya hay datos, pero no se ha mostrado el selector, no pasa nada porque el landing está visible.
 
         })();
     </script>
